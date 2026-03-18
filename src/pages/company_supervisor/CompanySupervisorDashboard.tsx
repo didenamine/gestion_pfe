@@ -13,11 +13,11 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
+//this is a comment to test the commit history and the git log command
 const data = {
   navMain: [
     {
-      title: "Getting Started (company supervisor)",
+      title: "Getting Started (company     supervisor)",
       url: "#",
       items: [
         {
