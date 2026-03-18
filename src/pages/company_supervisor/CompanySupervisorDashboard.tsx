@@ -17,7 +17,7 @@ import {
 const data = {
   navMain: [
     {
-      title: "Getting Started (company     supervisor)",
+      title: "Getting Started (company supervisor)",
       url: "#",
       items: [
         {
