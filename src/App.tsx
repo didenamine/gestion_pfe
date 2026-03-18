@@ -11,6 +11,7 @@ import CompanySupervisorDashboard from "@/pages/company_supervisor/CompanySuperv
 import StudentDashboard from "./pages/student/StudentDashboard";
 import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/signup";
+import HelloPage from "./pages/student/HelloPage";
 // Example auth context or state
 const fakeAuth = {
   isLoggedIn: true,
@@ -58,7 +59,13 @@ function App() {
               <StudentDashboard />
             </PrivateRoute>
           }
-        />
+        >
+          {/* Default page */}
+          <Route index element={<div>Student Home</div>} />
+
+          {/* Your new route */}
+          <Route path="hello" element={<HelloPage />} />
+        </Route>
 
         {/* Default/fallback route */}
         <Route path="*" element={<Navigate to="/login" replace />} />
