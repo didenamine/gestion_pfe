@@ -12,7 +12,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/signup";
 import HelloPage from "./pages/student/HelloPage";
-import CreateMeeting from "@/pages/university_supervisor/CreateMeeting";
+import CreateMeeting from "@/pages/student/CreateMeeting";
 
 // Example auth context or state
 const fakeAuth = {
@@ -49,11 +49,6 @@ function App() {
           {/* Default view when navigating strictly to /uni/dashboard */}
           <Route index element={<div>Welcome to the University Supervisor Dashboard</div>} />
 
-          {/* Meeting Routes mapped to our sidebar links */}
-          <Route path="meetings" element={<div>List of all meetings (Toutes les réunions) will go here!</div>} />
-          <Route path="meetings/pending-validation" element={<div>Pending validation meetings will go here!</div>} />
-          <Route path="meetings/create" element={<CreateMeeting />} />
-          <Route path="meetings/search" element={<div>Search meetings by Project/Reference will go here!</div>} />
         </Route>
         <Route
           path="/com/dashboard"
@@ -76,6 +71,12 @@ function App() {
 
           {/* Your new route */}
           <Route path="hello" element={<HelloPage />} />
+
+          {/* Meeting Routes mapped to our sidebar links */}
+          <Route path="meetings" element={<div>List of all meetings (Toutes les réunions) will go here!</div>} />
+          <Route path="meetings/pending-validation" element={<div>Pending validation meetings will go here!</div>} />
+          <Route path="meetings/create" element={<CreateMeeting />} />
+          <Route path="meetings/search" element={<div>Search meetings by Project/Reference will go here!</div>} />
         </Route>
 
         {/* Default/fallback route */}

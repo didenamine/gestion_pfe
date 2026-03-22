@@ -32,7 +32,7 @@ export default function CreateMeeting() {
   });
 
   const handleCancel = () => {
-    navigate("/uni/dashboard/meetings");
+    navigate("/student/dashboard/meetings");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +40,7 @@ export default function CreateMeeting() {
     setLoading(true);
     try {
       await createMeeting(formData);
-      navigate("/uni/dashboard/meetings");
+      navigate("/student/dashboard/meetings");
     } catch (error) {
       console.error("Error creating meeting:", error);
       alert("Failed to create meeting. Please try again.");

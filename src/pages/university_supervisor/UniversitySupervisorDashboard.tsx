@@ -18,26 +18,9 @@ import {
 const data = {
   navMain: [
     {
-      title: "Réunions (Meetings)",
-      url: "/uni/dashboard/meetings",
-      items: [
-        {
-          title: "Toutes les Réunions",
-          url: "/uni/dashboard/meetings",
-        },
-        {
-          title: "En Attente de Validation",
-          url: "/uni/dashboard/meetings/pending-validation",
-        },
-        {
-          title: "Créer une Réunion",
-          url: "/uni/dashboard/meetings/create",
-        },
-        {
-          title: "Par Projet / Référence",
-          url: "/uni/dashboard/meetings/search",
-        },
-      ],
+      title: "Dashboard",
+      url: "/uni/dashboard",
+      items: [],
     },
   ],
 };
