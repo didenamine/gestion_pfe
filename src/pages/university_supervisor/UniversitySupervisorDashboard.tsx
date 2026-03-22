@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { Outlet } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,137 +18,24 @@ import {
 const data = {
   navMain: [
     {
-      title: "Getting Started (university supervisor)",
-      url: "#",
+      title: "Réunions (Meetings)",
+      url: "/uni/dashboard/meetings",
       items: [
         {
-          title: "Installation",
-          url: "#",
+          title: "Toutes les Réunions",
+          url: "/uni/dashboard/meetings",
         },
         {
-          title: "Project Structure",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Build Your Application",
-      url: "#",
-      items: [
-        {
-          title: "Routing",
-          url: "#",
+          title: "En Attente de Validation",
+          url: "/uni/dashboard/meetings/pending-validation",
         },
         {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
+          title: "Créer une Réunion",
+          url: "/uni/dashboard/meetings/create",
         },
         {
-          title: "Rendering",
-          url: "#",
-        },
-        {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-        {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "API Reference",
-      url: "#",
-      items: [
-        {
-          title: "Components",
-          url: "#",
-        },
-        {
-          title: "File Conventions",
-          url: "#",
-        },
-        {
-          title: "Functions",
-          url: "#",
-        },
-        {
-          title: "next.config.js Options",
-          url: "#",
-        },
-        {
-          title: "CLI",
-          url: "#",
-        },
-        {
-          title: "Edge Runtime",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Architecture",
-      url: "#",
-      items: [
-        {
-          title: "Accessibility",
-          url: "#",
-        },
-        {
-          title: "Fast Refresh",
-          url: "#",
-        },
-        {
-          title: "Next.js Compiler",
-          url: "#",
-        },
-        {
-          title: "Supported Browsers",
-          url: "#",
-        },
-        {
-          title: "Turbopack",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Community",
-      url: "#",
-      items: [
-        {
-          title: "Contribution Guide",
-          url: "#",
+          title: "Par Projet / Référence",
+          url: "/uni/dashboard/meetings/search",
         },
       ],
     },
@@ -178,12 +66,7 @@ export default function UniversitySupervisorDashboard() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-          </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+          <Outlet />
         </div>
       </SidebarInset>
     </SidebarProvider>
