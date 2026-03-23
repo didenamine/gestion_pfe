@@ -45,6 +45,71 @@ export async function getProfile() {
   if (!response.ok) throw new Error("Failed to fetch profile");
 
   return response.json();
+} export async function requestPasswordReset(email: string) {
+  const response = await fetch(`${API_BASE}/auth/request-password-reset`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) throw new Error("Failed to request password reset");
+
+  return response.json();
 }
 
+export async function resetPassword(token: string, newPassword: string) {
+  const response = await fetch(`${API_BASE}/auth/reset-password?resetToken=${token}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ newPassword }),
+  });
 
+  if (!response.ok) throw new Error("Failed to reset password");
+
+  return response.json();
+}
+
+export async function signupStudent(data: any) {
+  const response = await fetch(`${API_BASE}/auth/signup/student`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Student signup failed");
+  }
+
+  return response.json();
+}
+
+export async function signupUniSupervisor(data: any) {
+  const response = await fetch(`${API_BASE}/auth/signup/supervisor-university`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "University supervisor signup failed");
+  }
+
+  return response.json();
+}
+
+export async function signupCompSupervisor(data: any) {
+  const response = await fetch(`${API_BASE}/auth/signup/supervisor-company`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Company supervisor signup failed");
+  }
+
+  return response.json();
+}

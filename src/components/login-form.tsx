@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { loginUser } from "@/services/auth";
 import { useState } from "react";
+import { ForgotPasswordModal } from "./forgot-password-modal";
 
 export function LoginForm({
   className,
@@ -18,6 +19,7 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent page reload
@@ -78,12 +80,13 @@ export function LoginForm({
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <a
-              href="#"
+            <button
+              type="button"
               className="ml-auto text-sm underline-offset-4 hover:underline"
+              onClick={() => setIsForgotPasswordOpen(true)}
             >
               Forgot your password?
-            </a>
+            </button>
           </div>
           <Input
             id="password"
@@ -110,12 +113,16 @@ export function LoginForm({
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}
-            <a href="#" className="underline underline-offset-4">
+            <a href="/signup" className="underline underline-offset-4">
               Sign up
             </a>
           </FieldDescription>
         </Field>
       </FieldGroup>
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onOpenChange={setIsForgotPasswordOpen}
+      />
     </form>
   );
 }
