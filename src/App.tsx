@@ -11,6 +11,7 @@ import CompanySupervisorDashboard from "@/pages/company_supervisor/CompanySuperv
 import StudentDashboard from "./pages/student/StudentDashboard";
 import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/signup";
+import ResetPasswordPage from "./pages/auth/reset-password";
 import HelloPage from "./pages/student/HelloPage";
 import CreateMeeting from "@/pages/student/CreateMeeting";
 
@@ -38,6 +39,7 @@ function App() {
         {/* University Supervisor dashboard */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/uni/dashboard"
           element={
