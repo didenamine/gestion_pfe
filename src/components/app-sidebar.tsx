@@ -1,9 +1,8 @@
 import * as React from "react";
-
+import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
@@ -13,122 +12,133 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
-import { GalleryVerticalEndIcon, LogOut, User } from "lucide-react";
-import { logoutUser } from "@/services/auth";
-import { useNavigate } from "react-router-dom";
-import { ProfileModal } from "@/components/profile-modal";
+import { GalleryVerticalEndIcon, LogOutIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// This is sample data.
-type SidebarItem = {
+type NavItem = {
   title: string;
   url: string;
-  isActive?: boolean;
-};
-
-type SidebarSection = {
-  title: string;
-  url: string;
-  items?: SidebarItem[];
+  icon?: React.ElementType;
+  items?: { title: string; url: string }[];
 };
 
 type SidebarData = {
-  navMain: SidebarSection[];
+  navMain: NavItem[];
 };
 
 export function AppSidebar({
   data,
+  userInfo,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   data: SidebarData;
+  userInfo?: { name: string; role: string };
 }) {
-  const navigate = useNavigate();
-  const [profileOpen, setProfileOpen] = React.useState(false);
+  const location = useLocation();
 
-  const handleLogout = async () => {
-    try {
-      await logoutUser();
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      // Even if API fails, we often want to clear local state and redirect
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      navigate("/login");
-    }
+  const isActive = (url: string) => {
+    if (url === "/student/dashboard") return location.pathname === url;
+    return location.pathname.startsWith(url);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
   };
 
   return (
-    <>
-      <Sidebar {...props}>
-        <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild>
-                <a href="#">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <GalleryVerticalEndIcon className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 leading-none">
-                    <span className="font-medium">Documentation</span>
-                    <span>v1.0.0</span>
-                  </div>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
+    <Sidebar {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link to="#">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <GalleryVerticalEndIcon className="size-4" />
+                </div>
+                <div className="flex flex-col gap-0.5 leading-none">
+                  <span className="font-semibold text-sm">PFE Tracker</span>
+                  <span className="text-xs text-muted-foreground">
+                    {userInfo?.role ?? "Système"}
+                  </span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarMenu>
-              {data.navMain.map((section) => (
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            {data.navMain.map((section) => {
+              const Icon = section.icon;
+              const hasChildren = section.items && section.items.length > 0;
+              const sectionActive = isActive(section.url);
+
+              return (
                 <SidebarMenuItem key={section.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={section.url} className="font-medium">
+                  <SidebarMenuButton
+                    asChild
+                    isActive={!hasChildren && sectionActive}
+                  >
+                    <Link to={section.url} className="font-medium">
+                      {Icon && <Icon className="size-4" />}
                       {section.title}
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
 
-                  {section.items?.length ? (
+                  {hasChildren ? (
                     <SidebarMenuSub>
-                      {section.items.map((item) => (
+                      {section.items!.map((item) => (
                         <SidebarMenuSubItem key={item.title}>
-                          <SidebarMenuSubButton asChild isActive={item.isActive}>
-                            <a href={item.url}>{item.title}</a>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={
+                              location.pathname === item.url ||
+                              (item.url !== section.url &&
+                                location.pathname.startsWith(item.url))
+                            }
+                          >
+                            <Link to={item.url}>{item.title}</Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>
                   ) : null}
                 </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-        </SidebarContent>
-
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setProfileOpen(true)}>
-                <User className="size-4" />
-                <span>Mon Profil</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={handleLogout} className="text-destructive hover:text-destructive">
-                <LogOut className="size-4" />
-                <span>Déconnexion</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
-        </SidebarFooter>
+        </SidebarGroup>
+      </SidebarContent>
 
-        <SidebarRail />
-      </Sidebar>
-      <ProfileModal open={profileOpen} onOpenChange={setProfileOpen} />
-    </>
+      <SidebarFooter>
+        {userInfo && (
+          <div className="px-2 py-1">
+            <div className="mb-2 px-2 py-1.5 rounded-md bg-muted/50">
+              <p className="text-xs font-medium text-foreground truncate">
+                {userInfo.name}
+              </p>
+              <p className="text-xs text-muted-foreground">{userInfo.role}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
+              onClick={handleLogout}
+            >
+              <LogOutIcon className="size-4 mr-2" />
+              Déconnexion
+            </Button>
+          </div>
+        )}
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
   );
 }
-
-

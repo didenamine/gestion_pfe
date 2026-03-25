@@ -11,9 +11,15 @@ import CompanySupervisorDashboard from "@/pages/company_supervisor/CompanySuperv
 import StudentDashboard from "./pages/student/StudentDashboard";
 import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/signup";
-import ResetPasswordPage from "./pages/auth/reset-password";
-import HelloPage from "./pages/student/HelloPage";
-import CreateMeeting from "@/pages/student/CreateMeeting";
+
+import StudentJournal from "./pages/student/studentJournal";
+import StudentProject from "./pages/student/StudentProject";
+import StudentSprints from "./pages/student/StudentSprints";
+import StudentOverview from "./pages/student/overview/StudentOverview";
+import StudentReports from "./pages/student/StudentReports";
+import StudentValidations from "./pages/student/StudentValidations";
+import StudentTasks from "./pages/student/StudentTasks";
+import StudentTaskHistory from "./pages/student/StudentTaskHistory";
 
 // Example auth context or state
 const fakeAuth = {
@@ -36,52 +42,47 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* University Supervisor dashboard */}
+        {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* ─── Student ──────────────────────────────────────────── */}
+        <Route path="/student" element={<StudentDashboard />}>
+          {
+            <Route
+              index
+              element={<Navigate to="/student/dashboard" replace />}
+            />
+            /*
+          
+          
+          
+          <Route path="meetings" element={<StudentMeetings />} />
+          
+           */
+          }
+          <Route path="tasks/history" element={<StudentTaskHistory />} />
+          <Route path="tasks" element={<StudentTasks />} />
+          <Route path="journal" element={<StudentJournal />} />
+          <Route path="project" element={<StudentProject />} />
+          <Route path="sprints" element={<StudentSprints />} />
+          <Route path="dashboard" element={<StudentOverview />} />
+          <Route path="stories" element={<StudentSprints />} />
+          <Route path="reports" element={<StudentReports />} />
+          <Route path="validations" element={<StudentValidations />} />
+        </Route>
+
+        {/* ─── University Supervisor ───────────────────────────── */}
         <Route
           path="/uni/dashboard"
-          element={
-            <PrivateRoute role="UniSupervisor">
-              <UniversitySupervisorDashboard />
-            </PrivateRoute>
-          }
-        >
-          {/* Default view when navigating strictly to /uni/dashboard */}
-          <Route index element={<div>Welcome to the University Supervisor Dashboard</div>} />
-
-        </Route>
-        <Route
-          path="/com/dashboard"
-          element={
-            <PrivateRoute role="CompSupervisor">
-              <CompanySupervisorDashboard />
-            </PrivateRoute>
-          }
+          element={<UniversitySupervisorDashboard />}
         />
-        <Route
-          path="/student/dashboard"
-          element={
-            <PrivateRoute role="Student">
-              <StudentDashboard />
-            </PrivateRoute>
-          }
-        >
-          {/* Default page */}
-          <Route index element={<div>Student Home</div>} />
 
-          {/* Your new route */}
-          <Route path="hello" element={<HelloPage />} />
+        {/* ─── Company Supervisor ──────────────────────────────── */}
+        <Route path="/com/dashboard" element={<CompanySupervisorDashboard />} />
 
-          {/* Meeting Routes mapped to our sidebar links */}
-          <Route path="meetings" element={<div>List of all meetings (Toutes les réunions) will go here!</div>} />
-          <Route path="meetings/pending-validation" element={<div>Pending validation meetings will go here!</div>} />
-          <Route path="meetings/create" element={<CreateMeeting />} />
-          <Route path="meetings/search" element={<div>Search meetings by Project/Reference will go here!</div>} />
-        </Route>
-
-        {/* Default/fallback route */}
+        {/* Default fallback */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
