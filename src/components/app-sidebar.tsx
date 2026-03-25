@@ -14,10 +14,11 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { GalleryVerticalEndIcon, LogOut, User } from "lucide-react";
+import { GalleryVerticalEndIcon, LogOutIcon, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ProfileModal } from "@/components/profile-modal";
 import { logoutUser } from "@/services/auth";
 import { useNavigate } from "react-router-dom";
-import { ProfileModal } from "@/components/profile-modal";
 
 // This is sample data.
 type SidebarItem = {
@@ -38,12 +39,14 @@ type SidebarData = {
 
 export function AppSidebar({
   data,
+  userInfo,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   data: SidebarData;
+  userInfo?: { name: string; role: string };
 }) {
   const navigate = useNavigate();
-  const [profileOpen, setProfileOpen] = React.useState(false);
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false);
 
   const handleLogout = async () => {
     try {
@@ -59,8 +62,7 @@ export function AppSidebar({
   };
 
   return (
-    <>
-      <Sidebar {...props}>
+    <Sidebar {...props}>
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -107,27 +109,43 @@ export function AppSidebar({
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => setProfileOpen(true)}>
-                <User className="size-4" />
-                <span>Mon Profil</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={handleLogout} className="text-destructive hover:text-destructive">
-                <LogOut className="size-4" />
-                <span>Déconnexion</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
+      <SidebarFooter>
+        {userInfo && (
+          <div className="px-2 py-1">
+            <div className="mb-2 px-2 py-1.5 rounded-md bg-muted/50">
+              <p className="text-xs font-medium text-foreground truncate">
+                {userInfo.name}
+              </p>
+              <p className="text-xs text-muted-foreground">{userInfo.role}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
+              onClick={() => setIsProfileOpen(true)}
+            >
+              <User className="size-4 mr-2" />
+              Profil
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
+              onClick={handleLogout}
+            >
+              <LogOutIcon className="size-4 mr-2" />
+              Déconnexion
+            </Button>
+          </div>
+        )}
+        <ProfileModal
+          open={isProfileOpen}
+          onOpenChange={setIsProfileOpen}
+        />
+      </SidebarFooter>
 
-        <SidebarRail />
-      </Sidebar>
-      <ProfileModal open={profileOpen} onOpenChange={setProfileOpen} />
-    </>
+      <SidebarRail />
+    </Sidebar>
   );
 }
 

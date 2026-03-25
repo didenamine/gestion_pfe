@@ -25,9 +25,23 @@ const data = {
   ],
 };
 export default function UniversitySupervisorDashboard() {
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") ?? "{}");
+    } catch {
+      return {};
+    }
+  })();
+
   return (
     <SidebarProvider>
-      <AppSidebar data={data} />
+      <AppSidebar
+        data={data}
+        userInfo={{
+          name: user.name ?? "Uni Supervisor",
+          role: user.role ?? "UniSupervisor",
+        }}
+      />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b">
           <div className="flex items-center gap-2 px-3">

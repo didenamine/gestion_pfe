@@ -34,11 +34,15 @@ export function ProfileModal({
     setError(null);
     try {
       const resp = await getProfile();
-      if (resp.success) {
-        setUser(resp.data.user);
-      } else {
-        setError(resp.message || "Failed to load profile");
-      }
+      // Backend response can vary (e.g. { success, data: { user } } vs direct user payload).
+      const maybeUser =
+        resp?.data?.user ??
+        resp?.user ??
+        (resp?.success ? resp?.data?.user : undefined) ??
+        resp;
+
+      if (maybeUser) setUser(maybeUser);
+      else setError(resp?.message || "Failed to load profile");
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -119,17 +123,20 @@ export function ProfileModal({
 
               {user.profile && (
                 <>
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
-                      <GraduationCap size={16} />
-                    </div>
-                    <div>
-                      <p className="font-medium">Diplôme</p>
-                      <p className="text-muted-foreground">
-                        {user.profile.degree} ({user.profile.degreeType})
-                      </p>
-                    </div>
-                  </div>
+                  {user.role !== "UniSupervisor" &&
+                    user.role !== "CompSupervisor" && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
+                          <GraduationCap size={16} />
+                        </div>
+                        <div>
+                          <p className="font-medium">Diplôme</p>
+                          <p className="text-muted-foreground">
+                            {user.profile.degree} ({user.profile.degreeType})
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                   <div className="flex items-center gap-3 text-sm">
                     <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
