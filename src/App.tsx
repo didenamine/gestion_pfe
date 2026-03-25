@@ -20,6 +20,8 @@ import StudentReports from "./pages/student/StudentReports";
 import StudentValidations from "./pages/student/StudentValidations";
 import StudentTasks from "./pages/student/StudentTasks";
 import StudentTaskHistory from "./pages/student/StudentTaskHistory";
+import StudentMeetings from "./pages/student/StudentMeetings";
+import CreateMeeting from "./pages/student/CreateMeeting";
 
 // Example auth context or state
 const fakeAuth = {
@@ -48,19 +50,12 @@ function App() {
 
         {/* ─── Student ──────────────────────────────────────────── */}
         <Route path="/student" element={<StudentDashboard />}>
-          {
-            <Route
-              index
-              element={<Navigate to="/student/dashboard" replace />}
-            />
-            /*
-          
-          
-          
+          <Route
+            index
+            element={<Navigate to="/student/dashboard" replace />}
+          />
           <Route path="meetings" element={<StudentMeetings />} />
-          
-           */
-          }
+          <Route path="meetings/create" element={<CreateMeeting />} />
           <Route path="tasks/history" element={<StudentTaskHistory />} />
           <Route path="tasks" element={<StudentTasks />} />
           <Route path="journal" element={<StudentJournal />} />
