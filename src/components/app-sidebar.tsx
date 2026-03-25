@@ -14,8 +14,9 @@ import {
   SidebarRail,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { GalleryVerticalEndIcon, LogOutIcon } from "lucide-react";
+import { GalleryVerticalEndIcon, LogOutIcon, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProfileModal } from "@/components/profile-modal";
 
 type NavItem = {
   title: string;
@@ -37,6 +38,7 @@ export function AppSidebar({
   userInfo?: { name: string; role: string };
 }) {
   const location = useLocation();
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false);
 
   const isActive = (url: string) => {
     if (url === "/student/dashboard") return location.pathname === url;
@@ -129,6 +131,15 @@ export function AppSidebar({
               variant="ghost"
               size="sm"
               className="w-full justify-start text-muted-foreground hover:text-foreground"
+              onClick={() => setIsProfileOpen(true)}
+            >
+              <User className="size-4 mr-2" />
+              Profil
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
               onClick={handleLogout}
             >
               <LogOutIcon className="size-4 mr-2" />
@@ -136,8 +147,11 @@ export function AppSidebar({
             </Button>
           </div>
         )}
+        <ProfileModal
+          open={isProfileOpen}
+          onOpenChange={setIsProfileOpen}
+        />
       </SidebarFooter>
-
       <SidebarRail />
     </Sidebar>
   );
