@@ -11,6 +11,8 @@ import CompanySupervisorDashboard from "@/pages/company_supervisor/CompanySuperv
 import StudentDashboard from "./pages/student/StudentDashboard";
 import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/signup";
+import EmailVerificationPage from "./pages/auth/verify-email";
+import ResetPasswordPage from "./pages/auth/reset-password";
 
 import StudentJournal from "./pages/student/studentJournal";
 import StudentProject from "./pages/student/StudentProject";
@@ -47,6 +49,9 @@ function App() {
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/api/auth/verify-email" element={<EmailVerificationPage />} />
+        <Route path="/auth/verify-email" element={<EmailVerificationPage />} />
+        <Route path="/api/auth/reset-password" element={<ResetPasswordPage />} />
 
         {/* ─── Student ──────────────────────────────────────────── */}
         <Route path="/student" element={<StudentDashboard />}>

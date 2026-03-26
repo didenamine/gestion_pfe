@@ -64,7 +64,10 @@ export async function resetPassword(token: string, newPassword: string) {
     body: JSON.stringify({ newPassword }),
   });
 
-  if (!response.ok) throw new Error("Failed to reset password");
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || errorData.message || "Failed to reset password");
+  }
 
   return response.json();
 }
@@ -78,7 +81,7 @@ export async function signupStudent(data: any) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "Student signup failed");
+    throw new Error(errorData.error || errorData.message || "Student signup failed");
   }
 
   return response.json();
@@ -93,7 +96,7 @@ export async function signupUniSupervisor(data: any) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "University supervisor signup failed");
+    throw new Error(errorData.error || errorData.message || "University supervisor signup failed");
   }
 
   return response.json();
@@ -108,7 +111,21 @@ export async function signupCompSupervisor(data: any) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || "Company supervisor signup failed");
+    throw new Error(errorData.error || errorData.message || "Company supervisor signup failed");
+  }
+
+  return response.json();
+}
+
+export async function verifyEmail(token: string) {
+  const response = await fetch(`${API_BASE}/auth/verify-email?token=${token}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || errorData.message || "Email verification failed");
   }
 
   return response.json();
