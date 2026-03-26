@@ -24,7 +24,6 @@ export const mockProject: Project = {
   compSupervisorId: "comp-1",
   compSupervisorName: "Nada Bouhadida",
   createdAt: "2025-10-01T09:00:00Z",
-  status: "active",
 };
 
 // ─── Sprints ──────────────────────────────────────────────────────────────────

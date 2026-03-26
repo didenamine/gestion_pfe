@@ -19,11 +19,13 @@ export interface Project {
   uniSupervisorName: string;
   compSupervisorId: string;
   compSupervisorName: string;
+  startDate?: string;
+  endDate?: string;
   createdAt: string;
-  status: "active" | "completed" | "archived";
 }
 
 // ─── Sprint ───────────────────────────────────────────────────────────────────
+
 export interface Sprint {
   id: string;
   projectId: string;
@@ -31,7 +33,6 @@ export interface Sprint {
   goal: string;
   startDate: string;
   endDate: string;
-  status: "planned" | "active" | "completed";
   order: number;
 }
 
@@ -39,12 +40,11 @@ export interface Sprint {
 export interface UserStory {
   id: string;
   sprintId: string;
-  projectId: string;
   title: string;
   description: string;
-  priority: "low" | "medium" | "high" | "critical";
-  estimatedPoints: number;
-  order: number;
+  priority: "highest" | "high" | "medium" | "low" | "lowest";
+  startDate: string;
+  endDate: string;
 }
 
 // ─── Task ─────────────────────────────────────────────────────────────────────
