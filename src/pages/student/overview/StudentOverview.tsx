@@ -13,6 +13,10 @@ import { Link } from "react-router-dom";
 import { ProgressBar, MeetingStatusBadge } from "@/components/ui/badges";
 import { Button } from "@/components/ui/button";
 import { useStudentDashboard } from "@/hooks/useStudentDashboard";
+import { useEffect, useState } from "react";
+import { getProject } from "@/services/projects";
+import type { Project } from "@/types";
+import { useToast } from "@/context/toast-context";
 
 // ─── Helpers localStorage ─────────────────────────────────────────────────────
 
@@ -99,8 +103,8 @@ function NoProjectState() {
       <div className="space-y-2 max-w-sm">
         <h3 className="font-semibold text-base">Aucun projet assigné</h3>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Vous n'êtes pas encore rattaché à un projet PFE.
-          Contactez votre encadrant pour être ajouté à un projet.
+          Vous n'êtes pas encore rattaché à un projet PFE. Contactez votre
+          encadrant pour être ajouté à un projet.
         </p>
       </div>
 
@@ -115,13 +119,29 @@ function NoProjectState() {
 // ─── Composant principal ──────────────────────────────────────────────────────
 
 export default function StudentOverview() {
-  const projectId = getProjectId();
-  const projectTitle = getProjectTitle();
+  const [project, setProject] = useState<Project | null>(null);
+  const { showToast } = useToast();
+  useEffect(() => {
+    (async () => {
+      try {
+        const fetchedProject = await getProject();
+        if (fetchedProject) setProject(fetchedProject);
+        console.log("Fetched project on mount:", fetchedProject);
+      } catch (err) {
+        console.error(err);
+        showToast({
+          type: "error",
+          message:
+            err instanceof Error ? err.message : "Failed to load project",
+        });
+      }
+    })();
+  }, []);
 
   const { progress, standbyTasks, meetings, loading, error } =
-    useStudentDashboard(projectId);
+    useStudentDashboard(project?.id || "");
 
-  if (!projectId) return <NoProjectState />;
+  if (!project) return <NoProjectState />;
   if (loading) return <LoadingState />;
   if (error) return <ErrorState message={error} />;
 
@@ -146,7 +166,6 @@ export default function StudentOverview() {
 
   return (
     <div className="space-y-6">
-
       {/* ── En-tête projet ── */}
       <div className="rounded-xl border bg-card p-5">
         <div className="flex items-start justify-between gap-4">
@@ -154,7 +173,7 @@ export default function StudentOverview() {
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
               Projet actif
             </p>
-            <h2 className="text-lg font-semibold">{projectTitle}</h2>
+            <h2 className="text-lg font-semibold">{project?.title}</h2>
           </div>
           <Link to="/student/project">
             <Button variant="outline" size="sm">
@@ -233,7 +252,6 @@ export default function StudentOverview() {
 
       {/* ── Réunions + Standby ── */}
       <div className="grid gap-4 md:grid-cols-2">
-
         {/* Réunions récentes */}
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between mb-4">
@@ -264,7 +282,12 @@ export default function StudentOverview() {
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {new Date(meeting.scheduledDate).toLocaleDateString(
                         "fr-FR",
-                        { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }
+                        {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        },
                       )}
                     </p>
                   </div>
@@ -317,7 +340,6 @@ export default function StudentOverview() {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
