@@ -20,11 +20,10 @@ import StudentSprints from "./pages/student/sprints/student-sprints";
 import StudentOverview from "./pages/student/overview/StudentOverview";
 import StudentReports from "./pages/student/StudentReports";
 import StudentValidations from "./pages/student/StudentValidations";
-import StudentTasks from "./pages/student/StudentTasks";
 import StudentTaskHistory from "./pages/student/StudentTaskHistory";
-import StudentMeetings from "./pages/student/StudentMeetings";
-import CreateMeeting from "./pages/student/CreateMeeting";
 import StudentUserStories from "./pages/student/user-stories/student-user-stories";
+import StudentTasks from "./pages/student/tasks/student-tasks";
+import StudentMeetings from "./pages/student/meetings/student-meetings";
 
 // Example auth context or state
 const fakeAuth = {
@@ -50,15 +49,20 @@ function App() {
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/api/auth/verify-email" element={<EmailVerificationPage />} />
+        <Route
+          path="/api/auth/verify-email"
+          element={<EmailVerificationPage />}
+        />
         <Route path="/auth/verify-email" element={<EmailVerificationPage />} />
-        <Route path="/api/auth/reset-password" element={<ResetPasswordPage />} />
+        <Route
+          path="/api/auth/reset-password"
+          element={<ResetPasswordPage />}
+        />
 
         {/* ─── Student ──────────────────────────────────────────── */}
         <Route path="/student" element={<StudentDashboard />}>
           <Route index element={<Navigate to="/student/dashboard" replace />} />
           <Route path="meetings" element={<StudentMeetings />} />
-          <Route path="meetings/create" element={<CreateMeeting />} />
           <Route path="tasks/history" element={<StudentTaskHistory />} />
           <Route path="tasks" element={<StudentTasks />} />
           <Route path="journal" element={<StudentJournal />} />

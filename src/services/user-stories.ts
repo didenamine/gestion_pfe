@@ -33,7 +33,7 @@ export async function getUserStories(): Promise<UserStory[]> {
         "Failed to fetch user stories",
     );
   }
-  console.log("Fetched user stories:", result.data);
+  console.log("Fetched user stories:", result);
   return result.data || null;
 }
 
@@ -79,6 +79,7 @@ export async function updateUserStory(
     body: payload,
   });
   const result = await response.json();
+  console.log("Update user story response:", result);
   if (!response.ok) {
     throw new Error(
       result.message + ": " + result.details?.join(", ") ||
@@ -89,14 +90,11 @@ export async function updateUserStory(
 }
 
 export async function deleteUserStory(userStoryId: string): Promise<void> {
-  const response = await fetch(
-    `${API_BASE}/project/user-stories/${userStoryId}`,
-    {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-      credentials: "include",
-    },
-  );
+  const response = await fetch(`${API_BASE}/user-story/${userStoryId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+    credentials: "include",
+  });
 
   const result = await response.json();
   if (!response.ok) {

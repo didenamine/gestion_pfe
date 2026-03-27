@@ -10,6 +10,7 @@ import {
 } from "@/services/user-stories";
 import { UserStoryDialog } from "./user-story-dialog";
 import { UserStoryItem } from "./user-story-item";
+import { useToast } from "@/context/toast-context";
 
 interface UserstoryForm {
   title: string;
@@ -32,6 +33,7 @@ export default function StudentUserStories() {
   });
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const { showToast } = useToast();
 
   // Fetch user stories
   useEffect(() => {
@@ -77,6 +79,11 @@ export default function StudentUserStories() {
       setOpen(false);
     } catch (err) {
       console.error(err);
+      showToast({
+        type: "error",
+        message:
+          err instanceof Error ? err.message : "Failed to save user story",
+      });
     }
   };
 
@@ -101,6 +108,11 @@ export default function StudentUserStories() {
       resetForm();
     } catch (err) {
       console.error(err);
+      showToast({
+        type: "error",
+        message:
+          err instanceof Error ? err.message : "Failed to delete user story",
+      });
     }
   };
 

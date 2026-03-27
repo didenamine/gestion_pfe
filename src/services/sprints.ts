@@ -27,6 +27,7 @@ export async function getSprints(): Promise<Sprint[]> {
   });
 
   const result = await response.json();
+  console.log("Fetched sprints:", result);
   if (!response.ok) {
     throw new Error(
       result.message + ": " + result.details?.join(", ") ||
@@ -77,6 +78,7 @@ export async function updateSprint(
   });
   const result = await response.json();
   if (!response.ok) {
+    console.error("Failed to update sprint:", result);
     throw new Error(
       result.message + ": " + result.details?.join(", ") ||
         "Failed to update sprint",
