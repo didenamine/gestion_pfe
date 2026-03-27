@@ -1,6 +1,5 @@
 import type { Sprint, Task, UserStory } from "@/types";
 import { format } from "date-fns";
-import type { SprintPayload } from "./sprints";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -14,14 +13,14 @@ const getAuthHeaders = () => {
 
 export interface userStoryPayload {
   title: string;
-  goal: string;
+  description: string;
   startDate: Date | null;
   endDate: Date | null;
-  order?: number;
+  priority: UserStory["priority"];
 }
 
 export async function getUserStories(): Promise<UserStory[]> {
-  const response = await fetch(`${API_BASE}/project/user-stories`, {
+  const response = await fetch(`${API_BASE}/user-story`, {
     method: "GET",
     headers: getAuthHeaders(),
     credentials: "include",
@@ -34,6 +33,7 @@ export async function getUserStories(): Promise<UserStory[]> {
         "Failed to fetch user stories",
     );
   }
+  console.log("Fetched user stories:", result.data);
   return result.data || null;
 }
 
@@ -41,7 +41,7 @@ export async function createUserStory(
   data: userStoryPayload,
 ): Promise<UserStory> {
   console.log("Creating user story with data:", data);
-  const response = await fetch(`${API_BASE}/project/user-stories`, {
+  const response = await fetch(`${API_BASE}/user-story`, {
     method: "POST",
     headers: getAuthHeaders(),
     credentials: "include",
@@ -72,15 +72,12 @@ export async function updateUserStory(
     endDate: data.endDate ? format(data.endDate, "yyyy-MM-dd") : undefined,
   });
   console.log("Updating user story %s with payload: %s", userStoryId, payload);
-  const response = await fetch(
-    `${API_BASE}/project/user-stories/${userStoryId}`,
-    {
-      method: "PATCH",
-      headers: getAuthHeaders(),
-      credentials: "include",
-      body: payload,
-    },
-  );
+  const response = await fetch(`${API_BASE}/user-story/${userStoryId}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    credentials: "include",
+    body: payload,
+  });
   const result = await response.json();
   if (!response.ok) {
     throw new Error(
@@ -108,6 +105,24 @@ export async function deleteUserStory(userStoryId: string): Promise<void> {
         "Failed to delete user story",
     );
   }
+}
+
+export async function getStoriesBySprint(
+  sprintId: string,
+): Promise<UserStory[]> {
+  const response = await fetch(`${API_BASE}/user-story/sprint/${sprintId}`, {
+    headers: getAuthHeaders(),
+    credentials: "include",
+  });
+  const result = await response.json();
+  console.log("Fetched user stories for sprint %s: %o", sprintId, result);
+  if (!response.ok) {
+    throw new Error(
+      result.message + ": " + result.details?.join(", ") ||
+        "Failed to fetch user stories",
+    );
+  }
+  return result.data.userStories || null;
 }
 
 // api/task.ts

@@ -1,17 +1,23 @@
 import { ProgressBar } from "@/components/ui/badges";
-import { getStoriesBySprint, getTasksBySprint } from "@/services/sprints";
 import type { Sprint, Task, UserStory } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useToast } from "@/context/toast-context";
+import { getStoriesBySprint } from "@/services/user-stories";
 
 interface SprintItemProps {
   sprint: Sprint;
   handleEdit: () => void;
   handleDelete: () => void;
 }
-
+const PRIORITY_COLOR: Record<UserStory["priority"], string> = {
+  highest: "text-red-500",
+  high: "text-orange-500",
+  medium: "text-yellow-500",
+  low: "text-blue-500",
+  lowest: "text-muted-foreground",
+};
 export function SprintItem({
   sprint,
   handleEdit,
@@ -19,7 +25,7 @@ export function SprintItem({
 }: SprintItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  // const [tasks, setTasks] = useState<Task[]>([]);
   const [stories, setStories] = useState<UserStory[]>([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -32,12 +38,9 @@ export function SprintItem({
       try {
         setLoading(true);
 
-        const [tasksData, storiesData] = await Promise.all([
-          getTasksBySprint(sprint.id),
-          getStoriesBySprint(sprint.id),
-        ]);
+        const storiesData = await getStoriesBySprint(sprint.id);
 
-        setTasks(tasksData);
+        // setTasks(tasksData);
         setStories(storiesData);
         setLoaded(true);
       } catch (err) {
@@ -57,10 +60,12 @@ export function SprintItem({
     fetchData();
   }, [isExpanded, loaded, sprint.id]);
 
-  const sprintTasks = tasks;
-  const done = sprintTasks.filter((t) => t.status === "Done").length;
+  const sprintUserStories = stories;
+  const high = sprintUserStories.filter((t) => t.priority === "high").length;
   const pct =
-    sprintTasks.length > 0 ? Math.round((done / sprintTasks.length) * 100) : 0;
+    sprintUserStories.length > 0
+      ? Math.round((high / sprintUserStories.length) * 100)
+      : 0;
 
   return (
     <div className="rounded-xl border bg-card overflow-hidden">
@@ -89,7 +94,8 @@ export function SprintItem({
           {/* RIGHT */}
           <div className="shrink-0 text-right space-y-1 min-w-30">
             <p className="text-xs text-muted-foreground tabular-nums">
-              {done}/{sprintTasks.length} tasks
+              {high > 0 && `${high} high /`}
+              {sprintUserStories.length}
             </p>
             <ProgressBar value={pct} size="sm" showLabel={false} />
 
@@ -115,12 +121,6 @@ export function SprintItem({
       {/* DETAILS */}
       {isExpanded && (
         <div className="border-t px-4 pb-4 pt-3 space-y-3">
-          {/* dates */}
-          <p className="text-xs text-muted-foreground">
-            {new Date(sprint.startDate).toLocaleDateString("fr-FR")} →{" "}
-            {new Date(sprint.endDate).toLocaleDateString("fr-FR")}
-          </p>
-
           {/* loading */}
           {loading && (
             <p className="text-sm text-muted-foreground text-center py-4">
@@ -139,36 +139,34 @@ export function SprintItem({
                   Ajouter
                 </Button>
               </div>
+              {stories.map((us) => (
+                <div key={us.id} className="border rounded p-3">
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-lg truncate">
+                        {us.title}
+                      </span>
 
-              {stories.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Aucune user story
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {stories.map((us) => {
-                    const usTasks = tasks.filter(
-                      (t) => t.userStoryId === us.id,
-                    );
-                    const usDone = usTasks.filter(
-                      (t) => t.status === "Done",
-                    ).length;
+                      <span
+                        className={`text-xs font-medium capitalize ${
+                          PRIORITY_COLOR[us.priority]
+                        }`}
+                      >
+                        {us.priority}
+                      </span>
+                    </div>
 
-                    return (
-                      <div key={us.id} className="border rounded p-3">
-                        <p className="font-medium text-sm">{us.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {us.description}
-                        </p>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {us.description}
+                    </p>
 
-                        <p className="text-xs mt-1">
-                          {usDone}/{usTasks.length} tâches
-                        </p>
-                      </div>
-                    );
-                  })}
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(us.startDate).toLocaleDateString("fr-FR")} →{" "}
+                      {new Date(us.endDate).toLocaleDateString("fr-FR")}
+                    </p>
+                  </div>
                 </div>
-              )}
+              ))}
             </>
           )}
         </div>

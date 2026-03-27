@@ -1,25 +1,30 @@
 import { ProgressBar } from "@/components/ui/badges";
-import { getStoriesBySprint, getTasksBySprint } from "@/services/sprints";
-import type { Sprint, Task, UserStory } from "@/types";
+import type { Task, UserStory } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 
-interface SprintItemProps {
-  sprint: Sprint;
+interface UserStoryItemProps {
+  userStory: UserStory;
   handleEdit: () => void;
   handleDelete: () => void;
 }
 
-export function SprintItem({
-  sprint,
+const PRIORITY_COLOR: Record<UserStory["priority"], string> = {
+  highest: "text-red-500",
+  high: "text-orange-500",
+  medium: "text-yellow-500",
+  low: "text-blue-500",
+  lowest: "text-muted-foreground",
+};
+
+export function UserStoryItem({
+  userStory,
   handleEdit,
   handleDelete,
-}: SprintItemProps) {
+}: UserStoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [stories, setStories] = useState<UserStory[]>([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -29,14 +34,8 @@ export function SprintItem({
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        const [tasksData, storiesData] = await Promise.all([
-          getTasksBySprint(sprint.id),
-          getStoriesBySprint(sprint.id),
-        ]);
-
-        setTasks(tasksData);
-        setStories(storiesData);
+        //const tasksData = await getTasksByUserStory(userStory.id);
+        //setTasks(tasksData);
         setLoaded(true);
       } catch (err) {
         console.error(err);
@@ -46,12 +45,10 @@ export function SprintItem({
     };
 
     fetchData();
-  }, [isExpanded, loaded, sprint.id]);
+  }, [isExpanded, loaded, userStory.id]);
 
-  const sprintTasks = tasks;
-  const done = sprintTasks.filter((t) => t.status === "Done").length;
-  const pct =
-    sprintTasks.length > 0 ? Math.round((done / sprintTasks.length) * 100) : 0;
+  const done = tasks.filter((t) => t.status === "Done").length;
+  const pct = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0;
 
   return (
     <div className="rounded-xl border bg-card overflow-hidden">
@@ -65,22 +62,27 @@ export function SprintItem({
           <div className="min-w-0 space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-semibold text-lg truncate">
-                {sprint.title}
+                {userStory.title}
+              </span>
+              <span
+                className={`text-xs font-medium capitalize ${PRIORITY_COLOR[userStory.priority]}`}
+              >
+                {userStory.priority}
               </span>
             </div>
             <p className="text-sm text-muted-foreground line-clamp-2">
-              {sprint.goal}
+              {userStory.description}
             </p>
             <p className="text-xs text-muted-foreground">
-              {new Date(sprint.startDate).toLocaleDateString("fr-FR")} →{" "}
-              {new Date(sprint.endDate).toLocaleDateString("fr-FR")}
+              {new Date(userStory.startDate).toLocaleDateString("fr-FR")} →{" "}
+              {new Date(userStory.endDate).toLocaleDateString("fr-FR")}
             </p>
           </div>
 
           {/* RIGHT */}
           <div className="shrink-0 text-right space-y-1 min-w-30">
             <p className="text-xs text-muted-foreground tabular-nums">
-              {done}/{sprintTasks.length} tasks
+              {done}/{tasks.length} tasks
             </p>
             <ProgressBar value={pct} size="sm" showLabel={false} />
 
@@ -89,12 +91,9 @@ export function SprintItem({
               className="flex gap-1 justify-end mt-1"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* EDIT */}
               <Button size="icon" variant="ghost" onClick={handleEdit}>
                 <MdEdit />
               </Button>
-
-              {/* DELETE */}
               <Button size="icon" variant="ghost" onClick={handleDelete}>
                 <MdDelete />
               </Button>
@@ -106,58 +105,38 @@ export function SprintItem({
       {/* DETAILS */}
       {isExpanded && (
         <div className="border-t px-4 pb-4 pt-3 space-y-3">
-          {/* dates */}
-          <p className="text-xs text-muted-foreground">
-            {new Date(sprint.startDate).toLocaleDateString("fr-FR")} →{" "}
-            {new Date(sprint.endDate).toLocaleDateString("fr-FR")}
-          </p>
-
-          {/* loading */}
           {loading && (
             <p className="text-sm text-muted-foreground text-center py-4">
               Loading...
             </p>
           )}
 
-          {/* stories */}
           {!loading && (
             <>
               <div className="flex justify-between">
                 <span className="text-sm font-medium">
-                  User Stories ({stories.length})
+                  Tasks ({tasks.length})
                 </span>
                 <Button size="sm" variant="outline">
-                  Ajouter
+                  Add Task
                 </Button>
               </div>
 
-              {stories.length === 0 ? (
+              {tasks.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  Aucune user story
+                  No tasks yet
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {stories.map((us) => {
-                    const usTasks = tasks.filter(
-                      (t) => t.userStoryId === us.id,
-                    );
-                    const usDone = usTasks.filter(
-                      (t) => t.status === "Done",
-                    ).length;
-
-                    return (
-                      <div key={us.id} className="border rounded p-3">
-                        <p className="font-medium text-sm">{us.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {us.description}
-                        </p>
-
-                        <p className="text-xs mt-1">
-                          {usDone}/{usTasks.length} tâches
-                        </p>
-                      </div>
-                    );
-                  })}
+                  {tasks.map((task) => (
+                    <div key={task.id} className="border rounded p-3">
+                      <p className="font-medium text-sm">{task.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {task.description}
+                      </p>
+                      <p className="text-xs mt-1">{task.status}</p>
+                    </div>
+                  ))}
                 </div>
               )}
             </>
