@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import type { Sprint, UserStory } from "@/types";
+import type { UserStory } from "@/types";
 import { Button } from "@/components/ui/button";
-import { createSprint } from "@/services/sprints";
 
-import { SprintDialog } from "./user-story-dialog";
 import {
+  createUserStory,
   deleteUserStory,
   getUserStories,
   updateUserStory,
-} from "@/services/usesr-stories";
+} from "@/services/user-stories";
+import { UserStoryDialog } from "./user-story-dialog";
+import { UserStoryItem } from "./user-story-item";
 
 interface UserstoryForm {
   title: string;
-  goal: string;
+  description: string;
+  priority: UserStory["priority"];
+  sprintId: string;
 }
 
 export default function StudentUserStories() {
@@ -21,7 +24,12 @@ export default function StudentUserStories() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentStory, setCurrentStory] = useState<UserStory | null>(null);
 
-  const [form, setForm] = useState<UserstoryForm>({ title: "", goal: "" });
+  const [form, setForm] = useState<UserstoryForm>({
+    title: "",
+    description: "",
+    priority: "medium",
+    sprintId: "",
+  });
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
@@ -34,7 +42,7 @@ export default function StudentUserStories() {
   }, []);
 
   const resetForm = () => {
-    setForm({ title: "", goal: "" });
+    setForm({ title: "", description: "", priority: "medium", sprintId: "" });
     setStartDate(null);
     setEndDate(null);
     setCurrentStory(null);
@@ -55,7 +63,7 @@ export default function StudentUserStories() {
           endDate,
         });
       } else {
-        await createSprint({
+        await createUserStory({
           ...form,
           startDate,
           endDate,
@@ -74,7 +82,12 @@ export default function StudentUserStories() {
 
   const handleEdit = (story: UserStory) => {
     setCurrentStory(story);
-    setForm({ title: story.title, goal: story.goal });
+    setForm({
+      title: story.title,
+      description: story.description,
+      priority: story.priority,
+      sprintId: story.sprintId,
+    });
     setStartDate(new Date(story.startDate));
     setEndDate(new Date(story.endDate));
     setIsEditing(true);
@@ -106,7 +119,7 @@ export default function StudentUserStories() {
         </Button>
       </div>
 
-      <SprintDialog
+      <UserStoryDialog
         open={open}
         setOpen={setOpen}
         isEditing={isEditing}
@@ -122,13 +135,12 @@ export default function StudentUserStories() {
       />
       <div className="space-y-3">
         {userStories.map((story) => (
-          //   <SprintItem
-          //     key={story.id}
-          //     sprint={story}
-          //     handleEdit={() => handleEdit(story)}
-          //     handleDelete={() => handleDelete(story.id)}
-          //   />
-          <h1>{story.title}</h1>
+          <UserStoryItem
+            key={story.id}
+            userStory={story}
+            handleEdit={() => handleEdit(story)}
+            handleDelete={() => handleDelete(story.id)}
+          />
         ))}
       </div>
     </div>

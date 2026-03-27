@@ -120,25 +120,3 @@ export async function getTasksBySprint(sprintId: string): Promise<Task[]> {
   }
   return result.data || null;
 }
-
-// api/userStory.ts
-
-export async function getStoriesBySprint(
-  sprintId: string,
-): Promise<UserStory[]> {
-  const response = await fetch(
-    `${API_BASE}/project/user-stories?sprintId=${sprintId}`,
-    {
-      headers: getAuthHeaders(),
-      credentials: "include",
-    },
-  );
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      result.message + ": " + result.details?.join(", ") ||
-        "Failed to fetch user stories",
-    );
-  }
-  return result.data || null;
-}
