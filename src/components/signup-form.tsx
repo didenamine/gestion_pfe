@@ -35,8 +35,8 @@ export function SignupForm({
     confirmPassword: "",
     // Student specific
     cin: "",
-    degree: "",
-    degreeType: "",
+    degree: "Bachelor",
+    degreeType: "AV",
     companyName: "",
     universitySupervisorId: "",
     companySupervisorId: "",
@@ -44,6 +44,12 @@ export function SignupForm({
     // Supervisor specific
     badgeIMG: "",
   });
+
+  const degreeTypes: Record<string, string[]> = {
+    Bachelor: ["AV", "CMM", "IMM", "BD", "MIME", "Coco-JV", "Coco-3D"],
+    Master: ["Pro IM", "Pro DCA", "Pro PAR", "R DISR", "R TMAC"],
+    Engineer: ["INLOG", "INREV"],
+  };
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -83,9 +89,9 @@ export function SignupForm({
           degree: formData.degree,
           degreeType: formData.degreeType,
           companyName: formData.companyName,
-          universitySupervisorId: formData.universitySupervisorId,
-          companySupervisorId: formData.companySupervisorId,
-          studentCard: formData.studentCard,
+          uniSupervisorId: formData.universitySupervisorId,
+          compSupervisorId: formData.companySupervisorId,
+          studentIdCardIMG: formData.studentCard,
         });
       } else if (role === "UniSupervisor") {
         await signupUniSupervisor({
@@ -110,9 +116,37 @@ export function SignupForm({
 
   if (success) {
     return (
-      <div className="flex flex-col gap-4 text-center">
-        <h1 className="text-2xl font-bold text-green-600">{success}</h1>
-        <Button onClick={() => (window.location.href = "/login")}>
+      <div className="flex flex-col gap-6 text-center max-w-sm mx-auto p-6 bg-green-50 rounded-xl border border-green-200 shadow-sm animate-in fade-in zoom-in duration-300">
+        <div className="flex justify-center">
+          <div className="size-16 bg-green-100 rounded-full flex items-center justify-center">
+            <svg
+              className="size-8 text-green-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-green-800 mb-2">Registration Successful!</h1>
+          <p className="text-green-700">
+            A verification email has been sent to <span className="font-semibold">{formData.email}</span>.
+            Please check your inbox and click the verification link to activate your account.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          className="hover:bg-green-100"
+          onClick={() => (window.location.href = "/login")}
+        >
           Go to Login
         </Button>
       </div>
@@ -177,11 +211,11 @@ export function SignupForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
+          <FieldLabel htmlFor="phoneNumber">Phone Number (8 digits)</FieldLabel>
           <Input
             id="phoneNumber"
             type="tel"
-            placeholder="+123456789"
+            placeholder="22333444"
             required
             value={formData.phoneNumber}
             onChange={handleInputChange}
@@ -190,7 +224,7 @@ export function SignupForm({
 
         <div className="grid grid-cols-2 gap-4">
           <Field>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <FieldLabel htmlFor="password">Password (Special, Cap, Num)</FieldLabel>
             <Input
               id="password"
               type="password"
@@ -216,35 +250,48 @@ export function SignupForm({
           <>
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="cin">CIN</FieldLabel>
+                <FieldLabel htmlFor="cin">CIN (8 digits)</FieldLabel>
                 <Input
                   id="cin"
                   type="text"
                   required
+                  placeholder="12345678"
                   value={formData.cin}
                   onChange={handleInputChange}
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="degree">Degree</FieldLabel>
-                <Input
-                  id="degree"
-                  type="text"
-                  required
+                <FieldLabel>Degree</FieldLabel>
+                <Select
                   value={formData.degree}
-                  onChange={handleInputChange}
-                />
+                  onValueChange={(val) => setFormData({...formData, degree: val, degreeType: degreeTypes[val][0]})}
+                >
+                  <SelectTrigger className="w-full h-10 border-input bg-background">
+                    <SelectValue placeholder="Select degree" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Bachelor">Bachelor</SelectItem>
+                    <SelectItem value="Master">Master</SelectItem>
+                    <SelectItem value="Engineer">Engineer</SelectItem>
+                  </SelectContent>
+                </Select>
               </Field>
             </div>
             <Field>
-              <FieldLabel htmlFor="degreeType">Degree Type</FieldLabel>
-              <Input
-                id="degreeType"
-                type="text"
-                required
+              <FieldLabel>Degree Type</FieldLabel>
+              <Select
                 value={formData.degreeType}
-                onChange={handleInputChange}
-              />
+                onValueChange={(val) => setFormData({...formData, degreeType: val})}
+              >
+                <SelectTrigger className="w-full h-10 border-input bg-background">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {degreeTypes[formData.degree]?.map((type) => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <Field>
               <FieldLabel htmlFor="companyName">Company Name</FieldLabel>
