@@ -18,11 +18,11 @@ import StudentSprints from "./pages/student/sprints/student-sprints";
 import StudentOverview from "./pages/student/overview/StudentOverview";
 import StudentReports from "./pages/student/StudentReports";
 import StudentValidations from "./pages/student/StudentValidations";
-import StudentTasks from "./pages/student/StudentTasks";
 import StudentTaskHistory from "./pages/student/StudentTaskHistory";
 import StudentMeetings from "./pages/student/StudentMeetings";
 import CreateMeeting from "./pages/student/CreateMeeting";
 import StudentUserStories from "./pages/student/user-stories/student-user-stories";
+import StudentTasks from "./pages/student/tasks/student-tasks";
 
 // Example auth context or state
 const fakeAuth = {

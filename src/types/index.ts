@@ -48,19 +48,14 @@ export interface UserStory {
 }
 
 // ─── Task ─────────────────────────────────────────────────────────────────────
-export type TaskStatus = "ToDo" | "InProgress" | "Standby" | "Done";
+export type TaskStatus = "todo" | "inprogress" | "standby" | "done";
 
 export interface Task {
   id: string;
   userStoryId: string;
-  sprintId: string;
-  projectId: string;
   title: string;
-  description: string;
   status: TaskStatus;
-  estimatedHours: number;
-  actualHours?: number;
-  assignee: string;
+  priority: "high" | "medium" | "low";
   createdAt: string;
   updatedAt: string;
 }

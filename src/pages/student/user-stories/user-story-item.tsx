@@ -3,6 +3,8 @@ import type { Task, UserStory } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
+import { getTasksbyUserStory } from "@/services/tasks";
+import { useToast } from "@/context/toast-context";
 
 interface UserStoryItemProps {
   userStory: UserStory;
@@ -27,6 +29,7 @@ export function UserStoryItem({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!isExpanded || loaded) return;
@@ -34,11 +37,18 @@ export function UserStoryItem({
     const fetchData = async () => {
       try {
         setLoading(true);
-        //const tasksData = await getTasksByUserStory(userStory.id);
-        //setTasks(tasksData);
+        const tasksData = await getTasksbyUserStory(userStory.id);
+        setTasks(tasksData);
         setLoaded(true);
       } catch (err) {
         console.error(err);
+        showToast({
+          type: "error",
+          message:
+            err instanceof Error
+              ? err.message
+              : "Failed to fetch user story details",
+        });
       } finally {
         setLoading(false);
       }
@@ -47,7 +57,7 @@ export function UserStoryItem({
     fetchData();
   }, [isExpanded, loaded, userStory.id]);
 
-  const done = tasks.filter((t) => t.status === "Done").length;
+  const done = tasks.filter((t) => t.status === "done").length;
   const pct = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0;
 
   return (
@@ -81,11 +91,6 @@ export function UserStoryItem({
 
           {/* RIGHT */}
           <div className="shrink-0 text-right space-y-1 min-w-30">
-            <p className="text-xs text-muted-foreground tabular-nums">
-              {done}/{tasks.length} tasks
-            </p>
-            <ProgressBar value={pct} size="sm" showLabel={false} />
-
             {/* ACTIONS */}
             <div
               className="flex gap-1 justify-end mt-1"
@@ -114,12 +119,27 @@ export function UserStoryItem({
           {!loading && (
             <>
               <div className="flex justify-between">
-                <span className="text-sm font-medium">
-                  Tasks ({tasks.length})
-                </span>
-                <Button size="sm" variant="outline">
-                  Add Task
-                </Button>
+                <div className="flex items-center justify-between gap-4 min-w-0 w-full">
+                  {/* LEFT */}
+                  <span className="text-sm font-medium whitespace-nowrap">
+                    Tasks ({tasks.length})
+                  </span>
+
+                  {/* RIGHT */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <p className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+                      {done > 0 && `${done} done / `}
+                      {tasks.length}
+                    </p>
+
+                    <ProgressBar
+                      className="w-32"
+                      value={pct}
+                      size="sm"
+                      showLabel={false}
+                    />
+                  </div>
+                </div>
               </div>
 
               {tasks.length === 0 ? (
@@ -132,7 +152,7 @@ export function UserStoryItem({
                     <div key={task.id} className="border rounded p-3">
                       <p className="font-medium text-sm">{task.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {task.description}
+                        {task.priority}
                       </p>
                       <p className="text-xs mt-1">{task.status}</p>
                     </div>

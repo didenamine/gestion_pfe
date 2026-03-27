@@ -1,35 +1,37 @@
 import { useEffect, useState } from "react";
-import type { UserStory } from "@/types";
+import type { Task, UserStory } from "@/types";
 import { Button } from "@/components/ui/button";
 
 import {
   createUserStory,
   deleteUserStory,
-  getUserStories,
   updateUserStory,
 } from "@/services/user-stories";
-import { UserStoryDialog } from "./user-story-dialog";
-import { UserStoryItem } from "./user-story-item";
+import { TaskItem } from "./task-item";
 import { useToast } from "@/context/toast-context";
+import { createTask, getAllTasks, updateTask } from "@/services/tasks";
+import { TaskDialog } from "./task-dialog";
 
-interface UserstoryForm {
+interface TaskForm {
   title: string;
-  description: string;
-  priority: UserStory["priority"];
-  sprintId: string;
+  status: Task["status"];
+  priority: Task["priority"];
+  createdAt?: string;
+  updatedAt?: string;
+  userStoryId: string;
 }
 
-export default function StudentUserStories() {
-  const [userStories, setUserStories] = useState<UserStory[]>([]);
+export default function StudentTasks() {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentStory, setCurrentStory] = useState<UserStory | null>(null);
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
 
-  const [form, setForm] = useState<UserstoryForm>({
+  const [form, setForm] = useState<TaskForm>({
     title: "",
-    description: "",
+    status: "todo",
     priority: "medium",
-    sprintId: "",
+    userStoryId: "",
   });
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -38,16 +40,16 @@ export default function StudentUserStories() {
   // Fetch user stories
   useEffect(() => {
     (async () => {
-      const data = await getUserStories();
-      setUserStories(data);
+      const data = await getAllTasks();
+      setTasks(data);
     })();
   }, []);
 
   const resetForm = () => {
-    setForm({ title: "", description: "", priority: "medium", sprintId: "" });
+    setForm({ title: "", status: "todo", priority: "medium", userStoryId: "" });
     setStartDate(null);
     setEndDate(null);
-    setCurrentStory(null);
+    setCurrentTask(null);
     setIsEditing(false);
   };
 
@@ -58,45 +60,38 @@ export default function StudentUserStories() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (isEditing && currentStory) {
-        await updateUserStory(currentStory.id, {
+      if (isEditing && currentTask) {
+        await updateTask(currentTask.id, {
           ...form,
-          startDate,
-          endDate,
         });
       } else {
-        await createUserStory({
+        await createTask({
           ...form,
-          startDate,
-          endDate,
         });
       }
 
       // Refresh list
-      const data = await getUserStories();
-      setUserStories(data);
+      const data = await getAllTasks();
+      setTasks(data);
       resetForm();
       setOpen(false);
     } catch (err) {
       console.error(err);
       showToast({
         type: "error",
-        message:
-          err instanceof Error ? err.message : "Failed to save user story",
+        message: err instanceof Error ? err.message : "Failed to save task",
       });
     }
   };
 
-  const handleEdit = (story: UserStory) => {
-    setCurrentStory(story);
+  const handleEdit = (task: Task) => {
+    setCurrentTask(task);
     setForm({
-      title: story.title,
-      description: story.description,
-      priority: story.priority,
-      sprintId: story.sprintId,
+      title: task.title,
+      status: task.status,
+      priority: task.priority,
+      userStoryId: task.userStoryId,
     });
-    setStartDate(new Date(story.startDate));
-    setEndDate(new Date(story.endDate));
     setIsEditing(true);
     setOpen(true);
   };
@@ -104,14 +99,13 @@ export default function StudentUserStories() {
   const handleDelete = async (userStoryId: string) => {
     try {
       await deleteUserStory(userStoryId);
-      setUserStories((prev) => prev.filter((s) => s.id !== userStoryId));
+      setTasks((prev) => prev.filter((t) => t.id !== userStoryId));
       resetForm();
     } catch (err) {
       console.error(err);
       showToast({
         type: "error",
-        message:
-          err instanceof Error ? err.message : "Failed to delete user story",
+        message: err instanceof Error ? err.message : "Failed to delete task",
       });
     }
   };
@@ -119,7 +113,7 @@ export default function StudentUserStories() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">User Stories</h2>
+        <h2 className="text-lg font-semibold">Tasks</h2>
         <Button
           size="sm"
           onClick={() => {
@@ -127,31 +121,27 @@ export default function StudentUserStories() {
             setOpen(true);
           }}
         >
-          New User Story
+          New Task
         </Button>
       </div>
 
-      <UserStoryDialog
+      <TaskDialog
         open={open}
         setOpen={setOpen}
         isEditing={isEditing}
         form={form}
         setForm={setForm}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
         handleSubmit={handleSubmit}
         handleChange={handleChange}
         resetForm={resetForm}
       />
       <div className="space-y-3">
-        {userStories.map((story) => (
-          <UserStoryItem
-            key={story.id}
-            userStory={story}
-            handleEdit={() => handleEdit(story)}
-            handleDelete={() => handleDelete(story.id)}
+        {tasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            handleEdit={() => handleEdit(task)}
+            handleDelete={() => handleDelete(task.id)}
           />
         ))}
       </div>

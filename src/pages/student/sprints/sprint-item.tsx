@@ -93,12 +93,6 @@ export function SprintItem({
 
           {/* RIGHT */}
           <div className="shrink-0 text-right space-y-1 min-w-30">
-            <p className="text-xs text-muted-foreground tabular-nums">
-              {high > 0 && `${high} high /`}
-              {sprintUserStories.length}
-            </p>
-            <ProgressBar value={pct} size="sm" showLabel={false} />
-
             {/* ACTIONS */}
             <div
               className="flex gap-1 justify-end mt-1"
@@ -132,12 +126,27 @@ export function SprintItem({
           {!loading && (
             <>
               <div className="flex justify-between">
-                <span className="text-sm font-medium">
-                  User Stories ({stories.length})
-                </span>
-                <Button size="sm" variant="outline">
-                  Ajouter
-                </Button>
+                <div className="flex items-center justify-between gap-4 min-w-0 w-full">
+                  {/* LEFT */}
+                  <span className="text-sm font-medium whitespace-nowrap">
+                    User Stories ({sprintUserStories.length})
+                  </span>
+
+                  {/* RIGHT */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <p className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+                      {high > 0 && `${high} high / `}
+                      {sprintUserStories.length}
+                    </p>
+
+                    <ProgressBar
+                      className="w-32"
+                      value={pct}
+                      size="sm"
+                      showLabel={false}
+                    />
+                  </div>
+                </div>
               </div>
               {stories.map((us) => (
                 <div key={us.id} className="border rounded p-3">
