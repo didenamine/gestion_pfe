@@ -8,7 +8,7 @@ import { resetPassword } from "@/services/auth";
 export function ResetPasswordForm() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get("token");
+  const token = searchParams.get("resetToken");
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

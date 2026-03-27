@@ -1,3 +1,5 @@
+// src/layouts/StudentDashboard.tsx
+
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
@@ -15,7 +17,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { studentNavData } from "@/config/navigation";
-import { mockProject } from "@/data/mockdata";
 
 const routeLabels: Record<string, string> = {
   "/student/dashboard": "Vue d'ensemble",
@@ -41,6 +42,10 @@ export default function StudentDashboard() {
       return {};
     }
   })();
+
+  // ← Remplace mockProject.title — adapte la clé selon ta structure auth
+  const projectTitle: string =
+    user.projectTitle ?? user.project?.title ?? null;
 
   return (
     <SidebarProvider>
@@ -69,10 +74,13 @@ export default function StudentDashboard() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+
           <div className="ml-auto">
-            <span className="text-xs text-muted-foreground hidden sm:block max-w-[200px] truncate">
-              {mockProject.title}
-            </span>
+            {projectTitle && (
+              <span className="text-xs text-muted-foreground hidden sm:block max-w-[200px] truncate">
+                {projectTitle}
+              </span>
+            )}
           </div>
         </header>
 
