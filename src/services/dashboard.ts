@@ -1,6 +1,6 @@
 // src/services/dashboard.api.ts
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:3000/api";
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -9,7 +9,6 @@ const getAuthHeaders = () => {
     Authorization: `Bearer ${token}`,
   };
 };
-
 
 export interface ProjectProgress {
   projectProgress: {
@@ -68,10 +67,10 @@ export interface Meeting {
   projectId: string;
 }
 
-
-
 /** GET /dashboard/:projectId — progression globale */
-export async function fetchProjectProgress(projectId: string): Promise<ProjectProgress> {
+export async function fetchProjectProgress(
+  projectId: string,
+): Promise<ProjectProgress> {
   const res = await fetch(`${BASE_URL}/dashboard/${projectId}`, {
     headers: getAuthHeaders(),
   });
@@ -93,11 +92,11 @@ export async function fetchStandbyTasks(): Promise<StandbyTask[]> {
 /** GET /dashboard/student/timeline?month=M&year=Y */
 export async function fetchStudentTimeline(
   month: number,
-  year: number
+  year: number,
 ): Promise<TimelineEvent[]> {
   const res = await fetch(
     `${BASE_URL}/dashboard/student/timeline?month=${month}&year=${year}`,
-    { headers: getAuthHeaders() }
+    { headers: getAuthHeaders() },
   );
   if (!res.ok) throw new Error("Erreur lors du chargement du timeline");
   const json = await res.json();
@@ -105,10 +104,12 @@ export async function fetchStudentTimeline(
 }
 
 /** GET /dashboard/supervisor/meetings/:projectId — 5 dernières réunions */
-export async function fetchLatestMeetings(projectId: string): Promise<Meeting[]> {
+export async function fetchLatestMeetings(
+  projectId: string,
+): Promise<Meeting[]> {
   const res = await fetch(
     `${BASE_URL}/dashboard/supervisor/meetings/${projectId}`,
-    { headers: getAuthHeaders() }
+    { headers: getAuthHeaders() },
   );
   if (!res.ok) throw new Error("Erreur lors du chargement des réunions");
   const json = await res.json();

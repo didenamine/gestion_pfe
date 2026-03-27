@@ -38,15 +38,15 @@ export function useStudentDashboard(projectId: string | null): DashboardData {
       setLoading(true);
       setError(null);
       try {
-        const [prog, tasks, mtgs] = await Promise.all([
+        const [prog, tasks] = await Promise.all([
           fetchProjectProgress(projectId),
           fetchStandbyTasks(),
-          fetchLatestMeetings(projectId),
+          //fetchLatestMeetings(projectId),
         ]);
         if (!cancelled) {
           setProgress(prog);
           setStandbyTasks(tasks);
-          setMeetings(mtgs);
+          //setMeetings(mtgs);
         }
       } catch (err) {
         if (!cancelled) {
@@ -58,7 +58,9 @@ export function useStudentDashboard(projectId: string | null): DashboardData {
     };
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   return { progress, standbyTasks, meetings, loading, error };
