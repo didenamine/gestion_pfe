@@ -22,7 +22,6 @@ export async function getTasksbyUserStory(
     headers: getAuthHeaders(),
   });
   const result = await response.json();
-  console.log("Fetched tasks for user story:", result);
   if (!response.ok) {
     throw new Error(
       result.message + ": " + result.details?.join(", ") ||
@@ -32,7 +31,7 @@ export async function getTasksbyUserStory(
   return result.data.tasks || null;
 }
 export async function getAllTasks(): Promise<Task[]> {
-  const response = await fetch(`${API_BASE}/tasks`, {
+  const response = await fetch(`${API_BASE}/tasks/project`, {
     headers: getAuthHeaders(),
   });
   const result = await response.json();
@@ -66,11 +65,12 @@ export async function updateTask(
   data: Partial<TaskPayload>,
 ): Promise<Task> {
   const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
-    method: "PUT",
+    method: "PATCH",
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
   const result = await response.json();
+  console.log("Update task response:", response);
   if (!response.ok) {
     throw new Error(
       result.message + ": " + result.details?.join(", ") ||
@@ -80,4 +80,20 @@ export async function updateTask(
     console.log("Updated task:", result);
   }
   return result.data || null;
+}
+
+export async function deleteTask(taskId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      result.message + ": " + result.details?.join(", ") ||
+        "Failed to delete task",
+    );
+  } else {
+    console.log("Deleted task:", result);
+  }
 }

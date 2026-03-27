@@ -15,10 +15,10 @@ const PRIORITY_COLOR: Record<Task["priority"], string> = {
 };
 
 const STATUS_COLOR: Record<Task["status"], string> = {
-  ToDo: "text-gray-500",
-  InProgress: "text-blue-500",
-  Standby: "text-yellow-500",
-  Done: "text-green-500",
+  todo: "text-gray-500",
+  inprogress: "text-blue-500",
+  standby: "text-yellow-500",
+  done: "text-green-500",
 };
 
 export function TaskItem({ task, handleEdit, handleDelete }: TaskItemProps) {

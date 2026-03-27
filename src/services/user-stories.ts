@@ -79,6 +79,7 @@ export async function updateUserStory(
     body: payload,
   });
   const result = await response.json();
+  console.log("Update user story response:", result);
   if (!response.ok) {
     throw new Error(
       result.message + ": " + result.details?.join(", ") ||

@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import type { Task, UserStory } from "@/types";
+import type { Task } from "@/types";
 import { Button } from "@/components/ui/button";
-
-import {
-  createUserStory,
-  deleteUserStory,
-  updateUserStory,
-} from "@/services/user-stories";
 import { TaskItem } from "./task-item";
 import { useToast } from "@/context/toast-context";
-import { createTask, getAllTasks, updateTask } from "@/services/tasks";
+import {
+  createTask,
+  deleteTask,
+  getAllTasks,
+  updateTask,
+} from "@/services/tasks";
 import { TaskDialog } from "./task-dialog";
 
 interface TaskForm {
@@ -33,8 +32,6 @@ export default function StudentTasks() {
     priority: "medium",
     userStoryId: "",
   });
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
   const { showToast } = useToast();
 
   // Fetch user stories
@@ -47,8 +44,6 @@ export default function StudentTasks() {
 
   const resetForm = () => {
     setForm({ title: "", status: "todo", priority: "medium", userStoryId: "" });
-    setStartDate(null);
-    setEndDate(null);
     setCurrentTask(null);
     setIsEditing(false);
   };
@@ -96,10 +91,10 @@ export default function StudentTasks() {
     setOpen(true);
   };
 
-  const handleDelete = async (userStoryId: string) => {
+  const handleDelete = async (taskId: string) => {
     try {
-      await deleteUserStory(userStoryId);
-      setTasks((prev) => prev.filter((t) => t.id !== userStoryId));
+      await deleteTask(taskId);
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
       resetForm();
     } catch (err) {
       console.error(err);

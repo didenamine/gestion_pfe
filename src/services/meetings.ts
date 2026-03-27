@@ -15,8 +15,15 @@ export async function createMeeting(data: any) {
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Failed to create meeting");
-  return response.json();
+  const result = await response.json();
+  console.log("Created meeting result:", result);
+  if (!response.ok) {
+    throw new Error(
+      result.message + ": " + result.details?.join(", ") ||
+        "Failed to create meeting",
+    );
+  }
+  return result.data || null;
 }
 
 export async function updateMeeting(id: string, data: any) {
@@ -25,8 +32,15 @@ export async function updateMeeting(id: string, data: any) {
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Failed to update meeting");
-  return response.json();
+  const result = await response.json();
+  console.log("update meeting result:", result);
+  if (!response.ok) {
+    throw new Error(
+      result.message + ": " + result.details?.join(", ") ||
+        "Failed to update meeting",
+    );
+  }
+  return result.data || null;
 }
 
 export async function deleteMeeting(id: string) {
@@ -62,8 +76,15 @@ export async function getMeetings() {
     method: "GET",
     headers: getAuthHeaders(),
   });
-  if (!response.ok) throw new Error("Failed to fetch meetings");
-  return response.json();
+  const result = await response.json();
+  console.log("Fetched meetings:", result);
+  if (!response.ok) {
+    throw new Error(
+      result.message + ": " + result.details?.join(", ") ||
+        "Failed to fetch meetings",
+    );
+  }
+  return result.data || null;
 }
 
 export async function getMeetingsByProject(projectId: string) {
@@ -89,7 +110,8 @@ export async function getPendingValidationMeetings() {
     method: "GET",
     headers: getAuthHeaders(),
   });
-  if (!response.ok) throw new Error("Failed to fetch pending validation meetings");
+  if (!response.ok)
+    throw new Error("Failed to fetch pending validation meetings");
   return response.json();
 }
 
