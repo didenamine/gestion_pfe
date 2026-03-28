@@ -102,17 +102,19 @@ export async function updateTaskStatus(
   taskId: string,
   status: Task["status"]
 ): Promise<Task> {
-  const response = await fetch(`${API_BASE}/api/tasks/status/${taskId}`, {
+  const response = await fetch(`${API_BASE}/tasks/status/${taskId}`, {
     method: "PATCH",
     headers: getAuthHeaders(),
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({
+      status,
+      validatorId: "000000000000000000000000",
+      meetingType: "reunion",
+      comment: "",
+    }),
   });
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(
-      result.message + ": " + result.details?.join(", ") ||
-        "Failed to update task status",
-    );
+    throw new Error(result.message || "Failed to update task status");
   }
-  return result.data || null;
+  return result.taskValidator || null;
 }
