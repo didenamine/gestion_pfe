@@ -3,19 +3,19 @@ import type { TaskStatus, ValidationStatus } from "@/types";
 
 // ─── Task Status Badge ────────────────────────────────────────────────────────
 const statusConfig: Record<TaskStatus, { label: string; className: string }> = {
-  ToDo: {
+  todo: {
     label: "À faire",
     className: "bg-slate-100 text-slate-700 border-slate-200",
   },
-  InProgress: {
+  inprogress: {
     label: "En cours",
     className: "bg-blue-50 text-blue-700 border-blue-200",
   },
-  Standby: {
+  standby: {
     label: "Bloquée",
     className: "bg-orange-50 text-orange-700 border-orange-200",
   },
-  Done: {
+  done: {
     label: "Terminée",
     className: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
@@ -40,10 +40,10 @@ export function TaskStatusBadge({
       <span
         className={cn(
           "h-1.5 w-1.5 rounded-full",
-          status === "ToDo" && "bg-slate-400",
-          status === "InProgress" && "bg-blue-500",
-          status === "Standby" && "bg-orange-500",
-          status === "Done" && "bg-emerald-500",
+          status === "todo" && "bg-slate-400",
+          status === "inprogress" && "bg-blue-500",
+          status === "standby" && "bg-orange-500",
+          status === "done" && "bg-emerald-500",
         )}
       />
       {cfg.label}
@@ -55,7 +55,8 @@ export function TaskStatusBadge({
 const validationConfig: Record<
   ValidationStatus,
   { label: string; className: string }
-> = {
+= {
+
   approved: {
     label: "Approuvée",
     className: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -168,7 +169,7 @@ export function ProgressBar({
             "h-full rounded-full transition-all duration-500",
             color,
           )}
-          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+          style={{ width: ${Math.min(100, Math.max(0, value))}% }}
         />
       </div>
 
