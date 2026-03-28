@@ -97,3 +97,22 @@ export async function deleteTask(taskId: string): Promise<void> {
     console.log("Deleted task:", result);
   }
 }
+
+export async function updateTaskStatus(
+  taskId: string,
+  status: Task["status"]
+): Promise<Task> {
+  const response = await fetch(`${API_BASE}/api/tasks/status/${taskId}`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      result.message + ": " + result.details?.join(", ") ||
+        "Failed to update task status",
+    );
+  }
+  return result.data || null;
+}

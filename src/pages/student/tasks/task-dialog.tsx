@@ -38,6 +38,7 @@ interface TaskDialogProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resetForm: () => void;
   trigger?: React.ReactNode;
+  disabledFields?: string[];
 }
 const STATUS_OPTIONS: Task["status"][] = [
   "todo",
@@ -57,6 +58,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
   handleSubmit,
   handleChange,
   resetForm,
+  disabledFields = [],
 }) => {
   const [userStories, setUserStories] = useState<
     { id: string; title: string }[]
@@ -98,6 +100,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
                 name="title"
                 value={form.title}
                 onChange={handleChange}
+                disabled={disabledFields?.includes("title")}
               />
             </div>
             {!isEditing && (
@@ -160,6 +163,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
                     priority: value as Task["priority"],
                   }))
                 }
+                disabled={disabledFields?.includes("priority")}
               >
                 <SelectTrigger className="w-full capitalize">
                   <SelectValue placeholder="Select priority" />
