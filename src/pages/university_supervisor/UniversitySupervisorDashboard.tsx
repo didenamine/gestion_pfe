@@ -35,11 +35,10 @@ const now = new Date();
 const navData = {
   navMain: [
     { title: "Dashboard", url: "/uni/dashboard" },
-    { title: "Projects",  url: "/uni/projects"  },  // ← ajouté
+    { title: "Projects",  url: "/uni/projects"  },  
   ],
 };
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
 
 function fmt(date: string | Date) {
   return new Date(date).toLocaleDateString("en-GB", {
