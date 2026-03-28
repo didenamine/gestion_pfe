@@ -22,7 +22,12 @@ import {
   deleteReport,
   downloadReport,
 } from "../../services/report";
-import type { Report, CreatedReport, UpdatedReport } from "../../types/report.ts";
+import type {
+  Report,
+  CreatedReport,
+  UpdatedReport,
+} from "../../types/report.ts";
+import { Input } from "@base-ui/react";
 
 // ── Helper : nom lisible depuis filePath ──────────────────────────────────────
 // filePath = "/uploads/reports/1712345678901_mon_rapport.pdf"
@@ -35,7 +40,10 @@ function friendlyName(filePath: string): string {
 // ── Helper : convertir CreatedReport → Report ─────────────────────────────────
 // createReport retourne { reportId, ... } au lieu de { _id, ... }.
 // On normalise pour pouvoir l'insérer dans le state Report[].
-function normalizeCreated(data: CreatedReport, existingCreatedAt?: string): Report {
+function normalizeCreated(
+  data: CreatedReport,
+  existingCreatedAt?: string,
+): Report {
   return {
     _id: data.reportId,
     versionLabel: data.versionLabel,
@@ -92,7 +100,9 @@ export default function StudentReports() {
       // Le backend trie déjà par versionLabel desc, on garde quand même le tri
       setReports([...data].sort((a, b) => b.versionLabel - a.versionLabel));
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Impossible de charger les rapports");
+      setError(
+        e instanceof Error ? e.message : "Impossible de charger les rapports",
+      );
     } finally {
       setLoading(false);
     }
@@ -123,13 +133,17 @@ export default function StudentReports() {
     setUploading(true);
     try {
       // createReport retourne CreatedReport { reportId, ... } — pas _id
-      const created: CreatedReport = await createReport(selectedFile, version, notes.trim());
+      const created: CreatedReport = await createReport(
+        selectedFile,
+        version,
+        notes.trim(),
+      );
 
       // On normalise CreatedReport → Report pour l'insérer dans le state
       const normalized = normalizeCreated(created);
 
       setReports((prev) =>
-        [normalized, ...prev].sort((a, b) => b.versionLabel - a.versionLabel)
+        [normalized, ...prev].sort((a, b) => b.versionLabel - a.versionLabel),
       );
 
       // Reset form
@@ -149,7 +163,8 @@ export default function StudentReports() {
   const handleDownload = async (report: Report) => {
     setDownloadingId(report._id);
     try {
-      const filename = friendlyName(report.filePath) || `rapport_v${report.versionLabel}.pdf`;
+      const filename =
+        friendlyName(report.filePath) || `rapport_v${report.versionLabel}.pdf`;
       await downloadReport(report._id, filename);
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : "Erreur lors du téléchargement");
@@ -174,13 +189,14 @@ export default function StudentReports() {
     setSavingId(reportId);
     try {
       // updateReport retourne UpdatedReport { reportId, notes, ... } — pas _id
-      const updated: UpdatedReport = await updateReport(reportId, editNotes.trim());
+      const updated: UpdatedReport = await updateReport(
+        reportId,
+        editNotes.trim(),
+      );
 
       // On patch le report existant avec les champs retournés
       setReports((prev) =>
-        prev.map((r) =>
-          r._id === reportId ? applyUpdate(r, updated) : r
-        )
+        prev.map((r) => (r._id === reportId ? applyUpdate(r, updated) : r)),
       );
       setEditingId(null);
     } catch (e: unknown) {
@@ -240,12 +256,15 @@ export default function StudentReports() {
         />
         <Upload className="size-8 text-muted-foreground/50 mx-auto mb-3" />
         {selectedFile ? (
-          <p className="text-sm font-medium text-blue-600">{selectedFile.name}</p>
+          <p className="text-sm font-medium text-blue-600">
+            {selectedFile.name}
+          </p>
         ) : (
           <>
             <p className="text-sm font-medium">Glisser-déposer un PDF ici</p>
             <p className="text-xs text-muted-foreground mt-1">
-              ou cliquez pour sélectionner un fichier (.pdf, .doc, .docx — 10 Mo max)
+              ou cliquez pour sélectionner un fichier (.pdf, .doc, .docx — 10 Mo
+              max)
             </p>
           </>
         )}
@@ -268,7 +287,7 @@ export default function StudentReports() {
           <label className="text-xs font-medium text-muted-foreground">
             Numéro de version <span className="text-red-500">*</span>
           </label>
-          <input
+          <Input
             type="number"
             min={1}
             value={versionLabel}
@@ -408,8 +427,7 @@ export default function StudentReports() {
                   {/* Méta */}
                   <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                     <span className="flex items-center gap-1">
-                      <Tag className="size-3" />
-                      v{rep.versionLabel}
+                      <Tag className="size-3" />v{rep.versionLabel}
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="size-3" />

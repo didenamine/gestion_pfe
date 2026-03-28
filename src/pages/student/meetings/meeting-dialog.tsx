@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAllReports } from "@/services/report";
 import { getAllTasks } from "@/services/tasks";
 import { getUserStories } from "@/services/user-stories";
 import { useEffect, useState } from "react";
@@ -98,14 +99,16 @@ export function MeetingDialog({
         });
         break;
       case "report":
-        // getReportVersions().then((reports) => {
-        //   if (!cancelled) {
-        //     setReferenceItems(
-        //       reports.map((r) => ({ id: r.id, title: r.version }))
-        //     );
-        //     setLoadingRefs(false);
-        //   }
-        // });
+        getAllReports().then((reports) => {
+          if (!cancelled) {
+            setReferenceItems(
+              [...reports]
+                .sort((a, b) => b.versionLabel - a.versionLabel)
+                .map((r) => ({ id: r._id, title: String(r.versionLabel) })),
+            );
+            setLoadingRefs(false);
+          }
+        });
         break;
     }
 
