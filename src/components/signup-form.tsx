@@ -33,7 +33,6 @@ export function SignupForm({
     email: "",
     password: "",
     confirmPassword: "",
-    // Student specific
     cin: "",
     degree: "Bachelor",
     degreeType: "AV",
@@ -41,7 +40,6 @@ export function SignupForm({
     universitySupervisorId: "",
     companySupervisorId: "",
     studentCard: "",
-    // Supervisor specific
     badgeIMG: "",
   });
 
@@ -55,8 +53,24 @@ export function SignupForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const handleRoleChange = (value: Role) => {
+    setRole(value);
+    setError("");
+    setFormData((prev: any) => ({
+      ...prev,
+      phoneNumber: "",
+      cin: "",
+    }));
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
+
+    if (id === "phoneNumber" || id === "cin") {
+      if (!/^\d*$/.test(value)) return;
+      if (value.length > 8) return;
+    }
+
     setFormData((prev: any) => ({ ...prev, [id]: value }));
   };
 
@@ -70,6 +84,16 @@ export function SignupForm({
       return;
     }
 
+    if (formData.phoneNumber.length !== 8) {
+      setError("Phone number must be exactly 8 digits");
+      return;
+    }
+
+    if (role === "Student" && formData.cin.length !== 8) {
+      setError("CIN must be exactly 8 digits");
+      return;
+    }
+
     setLoading(true);
     try {
       const baseData = {
@@ -79,8 +103,6 @@ export function SignupForm({
         password: formData.password,
         role: role,
       };
-
-      console.log("Submitting signup data:", baseData);
 
       if (role === "Student") {
         await signupStudent({
@@ -138,7 +160,8 @@ export function SignupForm({
         <div>
           <h1 className="text-2xl font-bold text-green-800 mb-2">Registration Successful!</h1>
           <p className="text-green-700">
-            A verification email has been sent to <span className="font-semibold">{formData.email}</span>.
+            A verification email has been sent to{" "}
+            <span className="font-semibold">{formData.email}</span>.
             Please check your inbox and click the verification link to activate your account.
           </p>
         </div>
@@ -171,10 +194,7 @@ export function SignupForm({
       <FieldGroup>
         <Field>
           <FieldLabel>Register as</FieldLabel>
-          <Select
-            value={role}
-            onValueChange={(value: Role) => setRole(value)}
-          >
+          <Select value={role} onValueChange={handleRoleChange}>
             <SelectTrigger className="w-full h-10 border-input bg-background">
               <SelectValue placeholder="Select a role" />
             </SelectTrigger>
@@ -211,12 +231,26 @@ export function SignupForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="phoneNumber">Phone Number (8 digits)</FieldLabel>
+          <FieldLabel htmlFor="phoneNumber">
+            Phone Number (8 digits)
+            {formData.phoneNumber.length > 0 && (
+              <span
+                className={`ml-2 text-xs font-normal ${
+                  formData.phoneNumber.length === 8
+                    ? "text-green-500"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {formData.phoneNumber.length}/8
+              </span>
+            )}
+          </FieldLabel>
           <Input
             id="phoneNumber"
             type="tel"
             placeholder="22333444"
             required
+            maxLength={8}
             value={formData.phoneNumber}
             onChange={handleInputChange}
           />
@@ -224,7 +258,7 @@ export function SignupForm({
 
         <div className="grid grid-cols-2 gap-4">
           <Field>
-            <FieldLabel htmlFor="password">Password (Special, Cap, Num)</FieldLabel>
+            <FieldLabel htmlFor="password">Password </FieldLabel>
             <Input
               id="password"
               type="password"
@@ -250,12 +284,26 @@ export function SignupForm({
           <>
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="cin">CIN (8 digits)</FieldLabel>
+                <FieldLabel htmlFor="cin">
+                  CIN (8 digits)
+                  {formData.cin.length > 0 && (
+                    <span
+                      className={`ml-2 text-xs font-normal ${
+                        formData.cin.length === 8
+                          ? "text-green-500"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {formData.cin.length}/8
+                    </span>
+                  )}
+                </FieldLabel>
                 <Input
                   id="cin"
                   type="text"
                   required
                   placeholder="12345678"
+                  maxLength={8}
                   value={formData.cin}
                   onChange={handleInputChange}
                 />
@@ -264,7 +312,13 @@ export function SignupForm({
                 <FieldLabel>Degree</FieldLabel>
                 <Select
                   value={formData.degree}
-                  onValueChange={(val) => setFormData({...formData, degree: val, degreeType: degreeTypes[val][0]})}
+                  onValueChange={(val) =>
+                    setFormData({
+                      ...formData,
+                      degree: val,
+                      degreeType: degreeTypes[val][0],
+                    })
+                  }
                 >
                   <SelectTrigger className="w-full h-10 border-input bg-background">
                     <SelectValue placeholder="Select degree" />
@@ -277,22 +331,28 @@ export function SignupForm({
                 </Select>
               </Field>
             </div>
+
             <Field>
               <FieldLabel>Degree Type</FieldLabel>
               <Select
                 value={formData.degreeType}
-                onValueChange={(val) => setFormData({...formData, degreeType: val})}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, degreeType: val })
+                }
               >
                 <SelectTrigger className="w-full h-10 border-input bg-background">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
                   {degreeTypes[formData.degree]?.map((type) => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
+
             <Field>
               <FieldLabel htmlFor="companyName">Company Name</FieldLabel>
               <Input
@@ -303,6 +363,7 @@ export function SignupForm({
                 onChange={handleInputChange}
               />
             </Field>
+
             <div className="grid grid-cols-2 gap-4">
               <Field>
                 <FieldLabel htmlFor="universitySupervisorId">Uni Supervisor ID</FieldLabel>
@@ -325,6 +386,7 @@ export function SignupForm({
                 />
               </Field>
             </div>
+
             <Field>
               <FieldLabel htmlFor="studentCard">Student ID Card</FieldLabel>
               <Input

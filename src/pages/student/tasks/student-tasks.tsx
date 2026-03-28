@@ -133,7 +133,7 @@ export default function StudentTasks() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Tasks</h2>
-        {!isStudent && (
+        
           <Button
             size="sm"
             onClick={() => {
@@ -143,7 +143,7 @@ export default function StudentTasks() {
           >
             New Task
           </Button>
-        )}
+      
       </div>
 
       <TaskDialog

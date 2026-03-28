@@ -100,7 +100,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
                 name="title"
                 value={form.title}
                 onChange={handleChange}
-                disabled={disabledFields?.includes("title")}
+                disabled={isEditing && disabledFields?.includes("title")}
               />
             </div>
             {!isEditing && (
@@ -163,7 +163,7 @@ export const TaskDialog: React.FC<TaskDialogProps> = ({
                     priority: value as Task["priority"],
                   }))
                 }
-                disabled={disabledFields?.includes("priority")}
+                disabled={isEditing && disabledFields?.includes("priority")}
               >
                 <SelectTrigger className="w-full capitalize">
                   <SelectValue placeholder="Select priority" />
