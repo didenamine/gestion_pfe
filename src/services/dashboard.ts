@@ -115,3 +115,7 @@ export async function fetchLatestMeetings(
   const json = await res.json();
   return json.data as Meeting[];
 }
+
+
+
+// supervisors
