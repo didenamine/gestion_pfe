@@ -7,6 +7,7 @@ import {
 import type { JSX } from "react";
 //import Login from "@/pages/auth/Login";
 import UniversitySupervisorDashboard from "@/pages/university_supervisor/UniversitySupervisorDashboard";
+
 import CompanySupervisorDashboard from "@/pages/company_supervisor/CompanySupervisorDashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import LoginPage from "./pages/auth/login";
@@ -26,7 +27,7 @@ import StudentTasks from "./pages/student/tasks/student-tasks";
 import StudentMeetings from "./pages/student/meetings/student-meetings";
 import UniversitySupervisorProjects from "./pages/university_supervisor/projects/university-supervisor-projects";
 import CompanySupervisorSprints from "./pages/company_supervisor/sprints/company-supervisor-sprints";
-
+import UniversitySupervisorSprints from "./pages/university_supervisor/sprints/university-supervisor-sprints";
 // Example auth context or state
 const fakeAuth = {
   isLoggedIn: true,
@@ -79,6 +80,7 @@ function App() {
         {/* ─── University Supervisor ───────────────────────────── */}
         <Route path="/uni/dashboard" element={<UniversitySupervisorDashboard />} />
         <Route path="/uni/projects" element={<UniversitySupervisorProjects />} />
+<Route path="/uni/sprints" element={<UniversitySupervisorSprints />} />
  
 
         {/* ─── Company Supervisor ──────────────────────────────── */}
