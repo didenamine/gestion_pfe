@@ -18,6 +18,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
+
+
 const navData = {
   navMain: [
     {
@@ -49,7 +51,7 @@ function ProjectsList() {
       try {
         setLoading(true);
         const fetched = await getSupervisorProjects();
-        console.log("Supervisor projects API response:", fetched); // debug
+        console.log("Supervisor projects API response:", fetched);
         if (fetched) setProjects(fetched);
       } catch (err) {
         console.error(err);
@@ -84,7 +86,10 @@ function ProjectsList() {
   return (
     <div className="p-6 space-y-4">
       {projects.map((project, i) => (
-        <SupervisorProjectCard key={project._id ?? project.id ?? i} project={project} />
+        <SupervisorProjectCard
+          key={project._id ?? project.id ?? `project-${i}`}
+          project={project}
+        />
       ))}
     </div>
   );
