@@ -4,6 +4,8 @@ interface SupervisorProjectCardProps {
   project: any;
 }
 
+
+
 function formatDate(date: string | null | undefined) {
   if (!date) return "—";
   return new Date(date).toLocaleDateString("fr-FR", {
