@@ -34,11 +34,12 @@ const now = new Date();
 const navData = {
   navMain: [
     {
-      
-      items: [
-        { title: "Dashboard", url: "/company/dashboard" },
-        { title: "Projects", url: "/company/projects" },
-      ],
+      title: "Dashboard",
+      url: "/company/dashboard",
+    },
+    {
+      title: "Projects",
+      url: "/company/projects",
     },
   ],
 };

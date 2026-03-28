@@ -13,7 +13,7 @@ import LoginPage from "./pages/auth/login";
 import SignupPage from "./pages/auth/signup";
 import EmailVerificationPage from "./pages/auth/verify-email";
 import ResetPasswordPage from "./pages/auth/reset-password";
-
+import CompanySupervisorProjects from "./pages/company_supervisor/projects/company-supervisor-projects";
 import StudentJournal from "./pages/student/studentJournal";
 import StudentProjects from "./pages/student/projects/student-projects";
 import StudentSprints from "./pages/student/sprints/student-sprints";
@@ -81,8 +81,9 @@ function App() {
         />
 
         {/* ─── Company Supervisor ──────────────────────────────── */}
-        <Route path="/com/dashboard" element={<CompanySupervisorDashboard />} />
-
+<Route path="/com/dashboard" element={<CompanySupervisorDashboard />} />
+<Route path="/company/dashboard" element={<CompanySupervisorDashboard />} />
+<Route path="/company/projects" element={<CompanySupervisorProjects />} />
         {/* Default fallback */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
