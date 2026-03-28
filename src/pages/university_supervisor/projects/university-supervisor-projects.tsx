@@ -31,6 +31,8 @@ const navData = {
   ],
 };
 
+
+
 function Spinner() {
   return (
     <div className="flex justify-center items-center py-16">
