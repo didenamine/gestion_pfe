@@ -4,7 +4,7 @@ const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   return {
     "Content-Type": "application/json",
-    ...(token ? { Authorization: Bearer ${token} } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 };
 
@@ -19,7 +19,7 @@ export interface TaskHistoryEntry {
 }
 
 export async function getTaskHistory(taskId: string): Promise<TaskHistoryEntry[]> {
-  const response = await fetch(${API_BASE}/tasks/history/${taskId}, {
+  const response = await fetch(`${API_BASE}/tasks/history/${taskId}`, {
     headers: getAuthHeaders(),
   });
   if (!response.ok) {

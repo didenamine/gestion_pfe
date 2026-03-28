@@ -55,7 +55,7 @@ export function TaskStatusBadge({
 const validationConfig: Record<
   ValidationStatus,
   { label: string; className: string }
-= {
+> = {
 
   approved: {
     label: "Approuvée",
@@ -169,7 +169,7 @@ export function ProgressBar({
             "h-full rounded-full transition-all duration-500",
             color,
           )}
-          style={{ width: ${Math.min(100, Math.max(0, value))}% }}
+          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
         />
       </div>
 
