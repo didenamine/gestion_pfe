@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Task } from "@/types";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TaskItem } from "./task-item";
 import { useToast } from "@/context/toast-context";
 import {
@@ -8,6 +9,7 @@ import {
   deleteTask,
   getAllTasks,
   updateTask,
+  updateTaskStatus,
 } from "@/services/tasks";
 import { TaskDialog } from "./task-dialog";
 
@@ -20,11 +22,20 @@ interface TaskForm {
   userStoryId: string;
 }
 
+function getStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "{}");
+  } catch {
+    return {};
+  }
+}
+
 export default function StudentTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const [isStudent, setIsStudent] = useState(false);
 
   const [form, setForm] = useState<TaskForm>({
     title: "",
@@ -34,8 +45,13 @@ export default function StudentTasks() {
   });
   const { showToast } = useToast();
 
-  // Fetch user stories
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+
   useEffect(() => {
+    const user = getStoredUser();
+    setIsStudent(user?.role?.toLowerCase() === "student");
+
     (async () => {
       const data = await getAllTasks();
       setTasks(data);
@@ -56,16 +72,16 @@ export default function StudentTasks() {
     e.preventDefault();
     try {
       if (isEditing && currentTask) {
-        await updateTask(currentTask.id, {
-          ...form,
-        });
+        if (isStudent) {
+          // Student : only status update via dedicated route
+          await updateTaskStatus(currentTask.id, form.status);
+        } else {
+          await updateTask(currentTask.id, { ...form });
+        }
       } else {
-        await createTask({
-          ...form,
-        });
+        await createTask({ ...form });
       }
 
-      // Refresh list
       const data = await getAllTasks();
       setTasks(data);
       resetForm();
@@ -91,17 +107,25 @@ export default function StudentTasks() {
     setOpen(true);
   };
 
-  const handleDelete = async (taskId: string) => {
+  const handleDelete = (taskId: string) => {
+    setTaskToDelete(taskId);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!taskToDelete) return;
     try {
-      await deleteTask(taskId);
-      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      await deleteTask(taskToDelete);
+      setTasks((prev) => prev.filter((t) => t.id !== taskToDelete));
       resetForm();
     } catch (err) {
-      console.error(err);
       showToast({
         type: "error",
         message: err instanceof Error ? err.message : "Failed to delete task",
       });
+    } finally {
+      setConfirmOpen(false);
+      setTaskToDelete(null);
     }
   };
 
@@ -109,15 +133,17 @@ export default function StudentTasks() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Tasks</h2>
-        <Button
-          size="sm"
-          onClick={() => {
-            resetForm();
-            setOpen(true);
-          }}
-        >
-          New Task
-        </Button>
+        {!isStudent && (
+          <Button
+            size="sm"
+            onClick={() => {
+              resetForm();
+              setOpen(true);
+            }}
+          >
+            New Task
+          </Button>
+        )}
       </div>
 
       <TaskDialog
@@ -129,7 +155,9 @@ export default function StudentTasks() {
         handleSubmit={handleSubmit}
         handleChange={handleChange}
         resetForm={resetForm}
+        disabledFields={isStudent ? ["title", "priority", "userStoryId"] : []}
       />
+
       <div className="space-y-3">
         {tasks.map((task) => (
           <TaskItem
@@ -140,6 +168,15 @@ export default function StudentTasks() {
           />
         ))}
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setTaskToDelete(null);
+        }}
+      />
     </div>
   );
 }
