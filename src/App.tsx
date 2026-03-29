@@ -28,6 +28,8 @@ import StudentMeetings from "./pages/student/meetings/student-meetings";
 import UniversitySupervisorProjects from "./pages/university_supervisor/projects/university-supervisor-projects";
 import CompanySupervisorSprints from "./pages/company_supervisor/sprints/company-supervisor-sprints";
 import UniversitySupervisorSprints from "./pages/university_supervisor/sprints/university-supervisor-sprints";
+import CompanySupervisorUserStories from "./pages/company_supervisor/user-stories/company-supervisor-user-stories";
+import UniversitySupervisorUserStories from "./pages/university_supervisor/user-stories/university-supervisor-user-stories";
 // Example auth context or state
 const fakeAuth = {
   isLoggedIn: true,
@@ -81,6 +83,8 @@ function App() {
         <Route path="/uni/dashboard" element={<UniversitySupervisorDashboard />} />
         <Route path="/uni/projects" element={<UniversitySupervisorProjects />} />
 <Route path="/uni/sprints" element={<UniversitySupervisorSprints />} />
+        <Route path="/uni/user-stories" element={<UniversitySupervisorUserStories />} />
+
  
 
         {/* ─── Company Supervisor ──────────────────────────────── */}
@@ -88,6 +92,8 @@ function App() {
 <Route path="/company/dashboard" element={<CompanySupervisorDashboard />} />
 <Route path="/company/projects" element={<CompanySupervisorProjects />} />
 <Route path="/company/sprints" element={<CompanySupervisorSprints />} />
+        <Route path="/company/user-stories" element={<CompanySupervisorUserStories />} />
+
         {/* Default fallback */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
