@@ -1,4 +1,4 @@
-import type { Project } from "../types";
+import type { Project } from "../types/dashboard";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -38,6 +38,5 @@ export async function getProjectSprints(projectId: string): Promise<any[]> {
   if (!response.ok) {
     throw new Error(result.message || "Failed to fetch project data");
   }
-  // result.data = { projectProgress: {...}, sprints: [...] }
   return result.data?.sprints ?? [];
 }
