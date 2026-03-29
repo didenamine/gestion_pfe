@@ -25,7 +25,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useToast } from "@/context/toast-context";
-import { getSupervisorProjects, getProjectSprints } from "@/services/supervisor";
+import { getSupervisorProjects } from "@/services/supervisor";
+import { getProgress } from "@/services/dahsboardSupervisors"; // ← même import que company
 
 // ─── nav ──────────────────────────────────────────────────────────────────────
 
@@ -49,6 +50,9 @@ interface UserStory {
   startDate?: string;
   endDate?: string;
   sprintTitle?: string;
+  totalTasks?: number;
+  doneTasks?: number;
+  progress?: number;
 }
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -125,6 +129,22 @@ function UserStoryCard({ story }: { story: UserStory }) {
         </p>
       )}
 
+      {/* progress bar (si disponible) */}
+      {story.progress !== undefined && (
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Progress</span>
+            <span>{story.doneTasks ?? 0} / {story.totalTasks ?? 0} tasks</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${Math.min(story.progress, 100)}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-3 pt-1 border-t">
         {story.sprintTitle && (
           <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground font-medium">
@@ -161,37 +181,23 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
         setLoading(true);
         setError(null);
 
-        const token =
-          typeof window !== "undefined"
-            ? (localStorage.getItem("token") ?? "")
-            : "";
+        // ✅ Même logique que company supervisor :
+        // getProgress retourne { projectProgress, sprints, meetings }
+        // chaque sprint contient userStories: UserStoryProgress[]
+        const result = await getProgress(projectId);
+        const sprints = result.data?.sprints ?? [];
 
-        // 1. fetch sprints
-        const sprintsData: any[] = await getProjectSprints(projectId);
-
-        // 2. fetch user stories for every sprint in parallel
         const allStories: UserStory[] = [];
-
-        await Promise.all(
-          (sprintsData ?? []).map(async (sprint: any) => {
-            const sid = sprint._id ?? sprint.id;
-            if (!sid) return;
-            try {
-              const res = await fetch(`/api/user-story/sprint/${sid}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              });
-              if (!res.ok) return;
-              const json = await res.json();
-              const list: UserStory[] =
-                json?.data?.userStories ?? json?.data ?? [];
-              list.forEach((s) =>
-                allStories.push({ ...s, sprintTitle: sprint.title })
-              );
-            } catch {
-              // skip sprint silently
-            }
-          })
-        );
+        sprints.forEach((sprint: any) => {
+          const sprintTitle = sprint.title;
+          (sprint.userStories ?? []).forEach((story: any) => {
+            allStories.push({
+              ...story,
+              id: story._id ?? story.id,
+              sprintTitle,
+            });
+          });
+        });
 
         setStories(allStories);
       } catch (err) {
