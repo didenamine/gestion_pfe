@@ -26,6 +26,7 @@ const routeLabels: Record<string, string> = {
   "/student/tasks": "Tâches — Kanban",
   "/student/tasks/history": "Historique des tâches",
   "/student/meetings": "Réunions",
+  "/student/meetings/:id": "Détail Réunion",
   "/student/reports": "Rapports",
   "/student/validations": "Validations",
   "/student/journal": "Journal de stage",

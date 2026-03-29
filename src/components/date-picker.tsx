@@ -13,12 +13,14 @@ interface DatePickerProps {
   value: Date | null;
   onChange: (date: Date) => void;
   placeholder?: string;
+  disabled?: (date: Date) => boolean;
 }
 
 export function DatePicker({
   value,
   onChange,
   placeholder = "Pick a date",
+  disabled,
 }: DatePickerProps) {
   const [open, setOpen] = useState(false);
 
@@ -38,6 +40,7 @@ export function DatePicker({
             if (date) onChange(date);
             setOpen(false);
           }}
+          disabled={disabled}
         />
       </PopoverContent>
     </Popover>

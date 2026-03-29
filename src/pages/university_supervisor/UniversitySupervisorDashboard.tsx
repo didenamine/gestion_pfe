@@ -34,9 +34,10 @@ const now = new Date();
 
 const navData = {
   navMain: [
-    { title: "Dashboard", url: "/uni/dashboard" },
-    { title: "Projects",  url: "/uni/projects"  },
-    { title: "Sprints",   url: "/uni/sprints"   },
+    { title: "Dashboard",    url: "/uni/dashboard"    },
+    { title: "Projects",     url: "/uni/projects"     },
+    { title: "Sprints",      url: "/uni/sprints"      },
+    { title: "User Stories", url: "/uni/user-stories" },
   ],
 };
 

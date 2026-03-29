@@ -27,6 +27,7 @@ const REFERENCE_TYPE_OPTIONS: { value: ReferenceType; label: string }[] = [
   { value: "task", label: "Task" },
   { value: "report", label: "Report" },
 ];
+
 interface MeetingDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -41,6 +42,7 @@ interface MeetingDialogProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resetForm: () => void;
 }
+
 interface MeetingForm {
   scheduledDate: string;
   agenda: string;
@@ -48,7 +50,10 @@ interface MeetingForm {
   referenceType: ReferenceType;
   referenceId: string;
 }
+
 type ReferenceType = "user_story" | "task" | "report";
+
+type ReferenceItem = { id: string; title: string }; 
 
 export function MeetingDialog({
   open,
@@ -64,13 +69,12 @@ export function MeetingDialog({
   handleChange,
   resetForm,
 }: MeetingDialogProps) {
-  const [referenceItems, setReferenceItems] = useState<
-    {
-      id: string;
-      title: string;
-    }[]
-  >([]);
+  const [referenceItems, setReferenceItems] = useState<ReferenceItem[]>([]); // 👈 corrigé
   const [loadingRefs, setLoadingRefs] = useState(false);
+
+  const tomorrow = new Date();
+  tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
   useEffect(() => {
     if (!open) return;
@@ -82,9 +86,7 @@ export function MeetingDialog({
       case "user_story":
         getUserStories().then((stories) => {
           if (!cancelled) {
-            setReferenceItems(
-              stories.map((s) => ({ id: s.id, title: s.title })),
-            );
+            setReferenceItems(stories.map((s) => ({ id: s.id, title: s.title })));
             setLoadingRefs(false);
           }
         });
@@ -100,9 +102,7 @@ export function MeetingDialog({
       case "report":
         // getReportVersions().then((reports) => {
         //   if (!cancelled) {
-        //     setReferenceItems(
-        //       reports.map((r) => ({ id: r.id, title: r.version }))
-        //     );
+        //     setReferenceItems(reports.map((r) => ({ id: r.id, title: r.version })));
         //     setLoadingRefs(false);
         //   }
         // });
@@ -136,30 +136,32 @@ export function MeetingDialog({
           </DialogHeader>
 
           <div className="space-y-3">
+            {/* Title */}
+            <div className="space-y-1">
+              <Label htmlFor="agenda">Title</Label>
+              <Input
+                id="agenda"
+                name="agenda"
+                required
+                value={form.agenda}
+                onChange={handleChange}
+                placeholder="Meeting Title..."
+              />
+            </div>
+
             {/* Scheduled date */}
             <div className="space-y-1">
               <Label>Scheduled Date</Label>
               <DatePicker
                 value={scheduledDate ?? null}
                 onChange={setScheduledDate}
+                disabled={(date) => date < tomorrow}
               />
             </div>
 
-            {/* Agenda */}
+            {/* Time */}
             <div className="space-y-1">
-              <Label htmlFor="agenda">Agenda</Label>
-              <Input
-                id="agenda"
-                name="agenda"
-                value={form.agenda}
-                onChange={handleChange}
-                placeholder="Meeting agenda..."
-              />
-            </div>
-
-            {/* Actual duration */}
-            <div className="space-y-1">
-              <Label htmlFor="actualMinutes">Actual Duration</Label>
+              <Label htmlFor="actualMinutes">Time</Label>
               <Input
                 id="actualMinutes"
                 name="actualMinutes"
@@ -167,9 +169,9 @@ export function MeetingDialog({
                 value={minutesToHhm(actualMinutes)}
                 onChange={(e) => setActualMinutes(hhmToMinutes(e.target.value))}
               />
-              <p className="text-xs text-muted-foreground">
+              {/* <p className="text-xs text-muted-foreground">
                 Hours : Minutes (e.g. 01:30 = 90 min)
-              </p>
+              </p> */}
             </div>
 
             {/* Reference type */}
@@ -220,7 +222,7 @@ export function MeetingDialog({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {referenceItems.map((item) => (
+                  {referenceItems.map((item: ReferenceItem) => ( 
                     <SelectItem key={item.id} value={item.id}>
                       {item.title}
                     </SelectItem>
@@ -245,6 +247,7 @@ export function MeetingDialog({
     </Dialog>
   );
 }
+
 async function fetchReferenceItems(
   type: ReferenceType,
 ): Promise<{ id: string; title: string }[]> {

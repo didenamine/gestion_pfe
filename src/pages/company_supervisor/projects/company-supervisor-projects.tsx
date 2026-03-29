@@ -25,6 +25,7 @@ const navData = {
     { title: "Dashboard", url: "/company/dashboard" },
     { title: "Projects",  url: "/company/projects"  },
     { title: "Sprints",   url: "/company/sprints"   },
+    { title: "User Stories", url: "/company/user-stories" },
   ],
 };
 
