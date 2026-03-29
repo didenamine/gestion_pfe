@@ -35,18 +35,10 @@ const now = new Date();
 
 const navData = {
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/company/dashboard",
-    },
-    {
-      title: "Projects",
-      url: "/company/projects",
-    },
-    {
-      title: "Sprints",
-      url: "/company/sprints",
-    },
+    { title: "Dashboard",    url: "/company/dashboard"    },
+    { title: "Projects",     url: "/company/projects"     },
+    { title: "Sprints",      url: "/company/sprints"      },
+    { title: "User Stories", url: "/company/user-stories" },
   ],
 };
 
@@ -269,8 +261,8 @@ function CompanyDashboardContent() {
                       </span>
                     </div>
                     <ProgressBar value={sprint.progress} />
-                    {sprint.userStories.map((us) => (
-                      <div key={us._id} className="flex items-center gap-2 mt-1.5 pl-3">
+                    {sprint.userStories.map((us, usIdx) => (
+                      <div key={us._id ?? `us-${sprint.id}-${usIdx}`} className="flex items-center gap-2 mt-1.5 pl-3">
                         <span className="text-xs text-muted-foreground w-28 truncate shrink-0">{us.title}</span>
                         <ProgressBar value={us.progress} />
                         <span className="text-xs text-muted-foreground w-8 text-right shrink-0">{us.progress}%</span>
@@ -294,7 +286,7 @@ function CompanyDashboardContent() {
                 {selectedProject.contributors.map((c, idx) => {
                   const colors = ["bg-primary", "bg-emerald-500", "bg-amber-500", "bg-violet-500", "bg-rose-500"];
                   return (
-                    <div key={c._id} className="flex items-center gap-3 p-2 rounded-lg bg-background/60">
+                    <div key={c._id ?? `contributor-${idx}`} className="flex items-center gap-3 p-2 rounded-lg bg-background/60">
                       <div className={`h-8 w-8 rounded-full ${colors[idx % colors.length]} flex items-center justify-center text-white text-sm font-bold shrink-0`}>
                         {c.fullName?.[0]?.toUpperCase() ?? "?"}
                       </div>
@@ -398,7 +390,7 @@ function CompanyDashboardContent() {
               <div className="absolute left-1.5 top-1 bottom-1 w-px bg-border" />
               <div className="flex flex-col gap-4">
                 {timeline.map((ev, i) => (
-                  <div key={i} className="relative">
+                  <div key={`${ev.type}-${ev.date}-${i}`} className="relative">
                     <div
                       className="absolute -left-4 top-1 h-2.5 w-2.5 rounded-full border-2 border-background"
                       style={{ background: EVENT_COLORS[ev.type] ?? "#94a3b8" }}
