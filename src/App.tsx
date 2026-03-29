@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import type { JSX } from "react";
 //import Login from "@/pages/auth/Login";
+import MeetingDetail from "./pages/student/meetings/meeting-detail";
 import UniversitySupervisorDashboard from "@/pages/university_supervisor/UniversitySupervisorDashboard";
 import CompanySupervisorDashboard from "@/pages/company_supervisor/CompanySupervisorDashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -61,6 +62,7 @@ function App() {
 
         {/* ─── Student ──────────────────────────────────────────── */}
         <Route path="/student" element={<StudentDashboard />}>
+        <Route path="/student/meetings/:id" element={<MeetingDetail />} />
           <Route index element={<Navigate to="/student/dashboard" replace />} />
           <Route path="meetings" element={<StudentMeetings />} />
           <Route path="tasks/history" element={<StudentTaskHistory />} />
