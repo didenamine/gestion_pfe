@@ -22,14 +22,9 @@ import {
 
 const navData = {
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/company/dashboard",
-    },
-    {
-      title: "Projects",
-      url: "/company/projects",
-    },
+    { title: "Dashboard", url: "/company/dashboard" },
+    { title: "Projects",  url: "/company/projects"  },
+    { title: "Sprints",   url: "/company/sprints"   },
   ],
 };
 
