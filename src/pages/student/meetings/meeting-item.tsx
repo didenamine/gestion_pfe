@@ -1,6 +1,17 @@
 // meeting-item.tsx
 import type { Meeting } from "@/types";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { MdDelete, MdEdit } from "react-icons/md";
 
 interface MeetingItemProps {
@@ -52,10 +63,31 @@ export function MeetingItem({
                 <MdEdit />
               </Button>
 
-              {/* DELETE */}
-              <Button size="icon" variant="ghost" onClick={handleDelete}>
-                <MdDelete />
-              </Button>
+              {/* DELETE avec confirmation */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="icon" variant="ghost">
+                    <MdDelete />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete meeting</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete{" "}
+                      <span className="font-semibold">"{meeting.agenda}"</span>?
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
             </div>
           </div>
         </div>
