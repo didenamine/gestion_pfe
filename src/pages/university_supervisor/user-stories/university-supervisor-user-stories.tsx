@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useToast } from "@/context/toast-context";
 import { getSupervisorProjects } from "@/services/supervisor";
-import { getProgress } from "@/services/dahsboardSupervisors"; // ← même import que company
+import { getProgress } from "@/services/dahsboardSupervisors"; 
 
 // ─── nav ──────────────────────────────────────────────────────────────────────
 
@@ -36,6 +36,7 @@ const navData = {
     { title: "Projects",     url: "/uni/projects"     },
     { title: "Sprints",      url: "/uni/sprints"      },
     { title: "User Stories", url: "/uni/user-stories" },
+                { title: "Reports",      url: "/uni/reports"      },
         { title: "Meetings",     url: "/uni/meetings"     },
 
   ],
@@ -182,10 +183,6 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
       try {
         setLoading(true);
         setError(null);
-
-        // ✅ Même logique que company supervisor :
-        // getProgress retourne { projectProgress, sprints, meetings }
-        // chaque sprint contient userStories: UserStoryProgress[]
         const result = await getProgress(projectId);
         const sprints = result.data?.sprints ?? [];
 

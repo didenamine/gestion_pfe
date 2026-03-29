@@ -31,6 +31,7 @@ import CompanySupervisorSprints from "./pages/company_supervisor/sprints/company
 import UniversitySupervisorSprints from "./pages/university_supervisor/sprints/university-supervisor-sprints";
 import CompanySupervisorUserStories from "./pages/company_supervisor/user-stories/company-supervisor-user-stories";
 import UniversitySupervisorUserStories from "./pages/university_supervisor/user-stories/university-supervisor-user-stories";
+import UniversitySupervisorReports from "./pages/university_supervisor/reports/UniversitySupervisorReports";
 // Example auth context or state
 const fakeAuth = {
   isLoggedIn: true,
@@ -86,6 +87,7 @@ function App() {
         <Route path="/uni/projects" element={<UniversitySupervisorProjects />} />
 <Route path="/uni/sprints" element={<UniversitySupervisorSprints />} />
         <Route path="/uni/user-stories" element={<UniversitySupervisorUserStories />} />
+                <Route path="/uni/reports" element={<UniversitySupervisorReports />} /> 
            <Route path="/uni/meetings" element={<UniversitySupervisorMeetings />} />
 
  
