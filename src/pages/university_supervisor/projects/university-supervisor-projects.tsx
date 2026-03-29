@@ -31,8 +31,6 @@ const navData = {
   ],
 };
 
-
-
 function Spinner() {
   return (
     <div className="flex justify-center items-center py-16">
@@ -87,7 +85,7 @@ function ProjectsList() {
     <div className="p-6 space-y-4">
       {projects.map((project, i) => (
         <UniSupervisorProjectCard
-          key={project._id ?? project.id ?? i}
+          key={project._id ?? project.id ?? `project-${i}`}
           project={project}
         />
       ))}

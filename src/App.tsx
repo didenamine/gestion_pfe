@@ -25,6 +25,7 @@ import StudentUserStories from "./pages/student/user-stories/student-user-storie
 import StudentTasks from "./pages/student/tasks/student-tasks";
 import StudentMeetings from "./pages/student/meetings/student-meetings";
 import UniversitySupervisorProjects from "./pages/university_supervisor/projects/university-supervisor-projects";
+import CompanySupervisorSprints from "./pages/company_supervisor/sprints/company-supervisor-sprints";
 
 // Example auth context or state
 const fakeAuth = {
@@ -84,6 +85,7 @@ function App() {
 <Route path="/com/dashboard" element={<CompanySupervisorDashboard />} />
 <Route path="/company/dashboard" element={<CompanySupervisorDashboard />} />
 <Route path="/company/projects" element={<CompanySupervisorProjects />} />
+<Route path="/company/sprints" element={<CompanySupervisorSprints />} />
         {/* Default fallback */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />

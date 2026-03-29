@@ -43,6 +43,10 @@ const navData = {
       title: "Projects",
       url: "/company/projects",
     },
+    {
+      title: "Sprints",
+      url: "/company/sprints",
+    },
   ],
 };
 
