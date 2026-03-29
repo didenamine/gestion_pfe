@@ -8,7 +8,7 @@ import type { JSX } from "react";
 //import Login from "@/pages/auth/Login";
 import MeetingDetail from "./pages/student/meetings/meeting-detail";
 import UniversitySupervisorDashboard from "@/pages/university_supervisor/UniversitySupervisorDashboard";
-
+import UniversitySupervisorMeetings from "./pages/university_supervisor/meetings/UniversitySupervisorMeetings";
 import CompanySupervisorDashboard from "@/pages/company_supervisor/CompanySupervisorDashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import LoginPage from "./pages/auth/login";
@@ -86,6 +86,7 @@ function App() {
         <Route path="/uni/projects" element={<UniversitySupervisorProjects />} />
 <Route path="/uni/sprints" element={<UniversitySupervisorSprints />} />
         <Route path="/uni/user-stories" element={<UniversitySupervisorUserStories />} />
+           <Route path="/uni/meetings" element={<UniversitySupervisorMeetings />} />
 
  
 
