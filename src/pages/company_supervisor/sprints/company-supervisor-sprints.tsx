@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CalendarDays, Target, Loader2 } from "lucide-react";
+import { CalendarDays, Target, Loader2, ChevronDown, ChevronUp, BookOpen, CheckCircle2, Circle, Clock } from "lucide-react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -52,61 +52,173 @@ function getSprintStatus(sprint: any): { label: string; cls: string } {
   return   { label: "Upcoming",  cls: "bg-muted text-muted-foreground" };
 }
 
+// ─── UserStory status helper ──────────────────────────────────────────────────
+
+function getUserStoryStatusIcon(status: string | undefined) {
+  switch ((status ?? "").toLowerCase()) {
+    case "done":
+    case "completed":
+      return <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />;
+    case "in progress":
+    case "inprogress":
+      return <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />;
+    default:
+      return <Circle className="h-3.5 w-3.5 text-muted-foreground shrink-0" />;
+  }
+}
+
+function getUserStoryStatusBadge(status: string | undefined) {
+  const s = (status ?? "todo").toLowerCase();
+  if (s === "done" || s === "completed")
+    return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+  if (s === "in progress" || s === "inprogress")
+    return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+  return "bg-muted text-muted-foreground";
+}
+
+// ─── UserStoriesList ──────────────────────────────────────────────────────────
+
+function UserStoriesList({ userStories }: { userStories: any[] }) {
+  if (userStories.length === 0) {
+    return (
+      <p className="text-xs text-muted-foreground italic py-1">
+        No user stories in this sprint.
+      </p>
+    );
+  }
+
+  return (
+    <ul className="space-y-2 mt-2">
+      {userStories.map((story: any, i: number) => {
+        const title  = story.title ?? story.name ?? story.description ?? `Story ${i + 1}`;
+        const status = story.status ?? story.state;
+        const priority = story.priority;
+
+        return (
+          <li
+            key={story._id ?? story.id ?? `story-${i}`}
+            className="flex items-start gap-2 rounded-md border bg-background/60 px-3 py-2"
+          >
+            {getUserStoryStatusIcon(status)}
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium leading-snug truncate">{title}</p>
+              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                {status && (
+                  <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${getUserStoryStatusBadge(status)}`}>
+                    {status}
+                  </span>
+                )}
+                {priority && (
+                  <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-muted text-muted-foreground">
+                    {priority}
+                  </span>
+                )}
+                {story.storyPoints !== undefined && (
+                  <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-primary/10 text-primary">
+                    {story.storyPoints} pts
+                  </span>
+                )}
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 // ─── SprintCard ───────────────────────────────────────────────────────────────
 
 function SprintCard({ sprint, index }: { sprint: any; index: number }) {
   const { label, cls } = getSprintStatus(sprint);
+  const [expanded, setExpanded] = useState(false);
+
+  // User stories may already be embedded in the sprint object
+  const userStories: any[] = sprint.userStories ?? sprint.stories ?? [];
 
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-3 hover:bg-muted/30 transition-colors">
-      {/* header */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-            {index + 1}
+    <div className="rounded-lg border bg-card shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+      {/* ── Sprint summary (always visible) ── */}
+      <div className="p-4 space-y-3">
+        {/* header */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+              {index + 1}
+            </span>
+            <h4 className="font-semibold text-sm">{sprint.title}</h4>
+          </div>
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
+            {label}
           </span>
-          <h4 className="font-semibold text-sm">{sprint.title}</h4>
         </div>
-        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
-          {label}
-        </span>
+
+        {/* goal */}
+        {sprint.goal && (
+          <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
+            <Target className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+            <span>{sprint.goal}</span>
+          </div>
+        )}
+
+        {/* progress */}
+        {sprint.progress !== undefined && (
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Progress</span>
+              <span>{sprint.progress}%</span>
+            </div>
+            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${Math.min(sprint.progress, 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* dates */}
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+          <span>{formatDate(sprint.startDate)} → {formatDate(sprint.endDate)}</span>
+        </div>
+
+        {/* tasks */}
+        {sprint.totalTasks !== undefined && (
+          <p className="text-xs text-muted-foreground">
+            {sprint.doneTasks ?? 0} / {sprint.totalTasks} tasks done
+          </p>
+        )}
+
+        {/* Toggle user stories button */}
+        <button
+          onClick={() => setExpanded(prev => !prev)}
+          className="flex w-full items-center justify-between rounded-md border border-dashed px-3 py-2 text-xs font-medium text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+        >
+          <span className="flex items-center gap-1.5">
+            <BookOpen className="h-3.5 w-3.5" />
+            {expanded ? "Hide User Stories" : "View User Stories"}
+            {userStories.length > 0 && (
+              <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                {userStories.length}
+              </span>
+            )}
+          </span>
+          {expanded
+            ? <ChevronUp className="h-3.5 w-3.5" />
+            : <ChevronDown className="h-3.5 w-3.5" />
+          }
+        </button>
       </div>
 
-      {/* goal */}
-      {sprint.goal && (
-        <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
-          <Target className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-          <span>{sprint.goal}</span>
+      {/* ── User stories panel ── */}
+      {expanded && (
+        <div className="border-t bg-muted/20 px-4 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+            User Stories
+          </p>
+          <UserStoriesList userStories={userStories} />
         </div>
-      )}
-
-      {/* progress */}
-      {sprint.progress !== undefined && (
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Progress</span>
-            <span>{sprint.progress}%</span>
-          </div>
-          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full rounded-full bg-primary transition-all"
-              style={{ width: `${Math.min(sprint.progress, 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* dates */}
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-        <span>{formatDate(sprint.startDate)} → {formatDate(sprint.endDate)}</span>
-      </div>
-
-      {/* tasks */}
-      {sprint.totalTasks !== undefined && (
-        <p className="text-xs text-muted-foreground">
-          {sprint.doneTasks ?? 0} / {sprint.totalTasks} tasks done
-        </p>
       )}
     </div>
   );
