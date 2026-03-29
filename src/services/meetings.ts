@@ -23,7 +23,7 @@ export async function createMeeting(data: any) {
         "Failed to create meeting",
     );
   }
-  return result.data || null;
+  return result.data ?? null;
 }
 
 export async function updateMeeting(id: string, data: any) {
@@ -40,7 +40,7 @@ export async function updateMeeting(id: string, data: any) {
         "Failed to update meeting",
     );
   }
-  return result.data || null;
+  return result.data ?? null;
 }
 
 export async function deleteMeeting(id: string) {
@@ -62,13 +62,25 @@ export async function completeMeeting(id: string, data: any) {
   return response.json();
 }
 
-export async function validateMeeting(id: string) {
+/**
+ * Validate or reject a meeting (University Supervisor only).
+ * PATCH /meetings/:id/validate
+ * Body: { validationStatus: "valid" | "invalid" }
+ */
+export async function validateMeeting(
+  id: string,
+  validationStatus: "valid" | "invalid",
+) {
   const response = await fetch(`${API_BASE}/meetings/${id}/validate`, {
     method: "PATCH",
     headers: getAuthHeaders(),
+    body: JSON.stringify({ validationStatus }),
   });
-  if (!response.ok) throw new Error("Failed to validate meeting");
-  return response.json();
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to validate meeting");
+  }
+  return result;
 }
 
 export async function getMeetings() {
@@ -84,7 +96,8 @@ export async function getMeetings() {
         "Failed to fetch meetings",
     );
   }
-  return result.data || null;
+  // FIX: retourner [] au lieu de null pour éviter les erreurs Array.isArray
+  return result.data ?? [];
 }
 
 export async function getMeetingsByProject(projectId: string) {
@@ -92,8 +105,10 @@ export async function getMeetingsByProject(projectId: string) {
     method: "GET",
     headers: getAuthHeaders(),
   });
+  const result = await response.json();
   if (!response.ok) throw new Error("Failed to fetch meetings by project");
-  return response.json();
+  // FIX: retourner [] au lieu de null
+  return result.data ?? [];
 }
 
 export async function getMeetingsByReference(type: string, id: string) {
@@ -105,14 +120,20 @@ export async function getMeetingsByReference(type: string, id: string) {
   return response.json();
 }
 
+/**
+ * List all meetings with status "pending" (University Supervisor only).
+ * GET /meetings/pending-validation
+ */
 export async function getPendingValidationMeetings() {
   const response = await fetch(`${API_BASE}/meetings/pending-validation`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
+  const result = await response.json();
   if (!response.ok)
     throw new Error("Failed to fetch pending validation meetings");
-  return response.json();
+  // FIX: retourner [] au lieu de null pour garantir un tableau
+  return result.data ?? [];
 }
 
 export async function changeMeetingReference(id: string, refData: any) {

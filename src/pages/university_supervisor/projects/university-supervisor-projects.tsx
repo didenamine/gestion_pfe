@@ -26,6 +26,7 @@ const navData = {
     { title: "User Stories", url: "/uni/user-stories" },
         { title: "Reports",      url: "/uni/reports"      },
 
+    { title: "Meetings",     url: "/uni/meetings"     },
   ],
 };
 
