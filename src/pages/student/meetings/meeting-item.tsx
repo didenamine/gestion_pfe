@@ -44,8 +44,10 @@ export function MeetingItem({
                 month: "short",
                 year: "numeric",
               })}
-              {" for "}
-              {meeting.actualMinutes} minutes
+              {" at "}
+              <span className="font-medium text-foreground">
+                {meeting.actualMinutes}
+              </span>
             </p>
 
             {meeting.agenda && (

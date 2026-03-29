@@ -36,8 +36,6 @@ interface MeetingDialogProps {
   setForm: React.Dispatch<React.SetStateAction<MeetingForm>>;
   scheduledDate: Date | null;
   setScheduledDate: (date: Date) => void;
-  actualMinutes: string | null;
-  setActualMinutes: (minutes: string) => void;
   handleSubmit: (e: React.FormEvent) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   resetForm: () => void;
@@ -63,8 +61,6 @@ export function MeetingDialog({
   setForm,
   scheduledDate,
   setScheduledDate,
-  actualMinutes,
-  setActualMinutes,
   handleSubmit,
   handleChange,
   resetForm,
@@ -166,12 +162,9 @@ export function MeetingDialog({
                 id="actualMinutes"
                 name="actualMinutes"
                 type="time"
-                value={minutesToHhm(actualMinutes)}
-                onChange={(e) => setActualMinutes(hhmToMinutes(e.target.value))}
+                value={form.actualMinutes ?? "00:00"}
+                onChange={handleChange}
               />
-              {/* <p className="text-xs text-muted-foreground">
-                Hours : Minutes (e.g. 01:30 = 90 min)
-              </p> */}
             </div>
 
             {/* Reference type */}
@@ -248,29 +241,4 @@ export function MeetingDialog({
   );
 }
 
-async function fetchReferenceItems(
-  type: ReferenceType,
-): Promise<{ id: string; title: string }[]> {
-  switch (type) {
-    case "task":
-      return getAllTasks();
-    case "user_story":
-      return getUserStories();
-    default:
-      return [];
-  }
-}
 
-function hhmToMinutes(value: string): string {
-  const [h, m] = value.split(":").map(Number);
-  if (isNaN(h) || isNaN(m)) return "";
-  return String(h * 60 + m);
-}
-
-function minutesToHhm(minutes: string | null | undefined): string {
-  const total = parseInt(minutes ?? "0", 10);
-  if (isNaN(total) || total < 0) return "00:00";
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
