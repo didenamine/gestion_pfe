@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,8 @@ import {
   signupStudent,
   signupUniSupervisor,
   signupCompSupervisor,
+  getUniversitySupervisors,
+  getCompanySupervisors,
 } from "@/services/auth";
 
 type Role = "Student" | "UniSupervisor" | "CompSupervisor";
@@ -52,6 +54,19 @@ export function SignupForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [uniSupervisors, setUniSupervisors] = useState<{ _id: string; fullName: string }[]>([]);
+  const [compSupervisors, setCompSupervisors] = useState<{ _id: string; fullName: string }[]>([]);
+
+  useEffect(() => {
+    if (role === "Student") {
+      getUniversitySupervisors()
+        .then((res) => setUniSupervisors(res.data || []))
+        .catch((err) => console.error("Error fetching uni supervisors:", err));
+      getCompanySupervisors()
+        .then((res) => setCompSupervisors(res.data || []))
+        .catch((err) => console.error("Error fetching comp supervisors:", err));
+    }
+  }, [role]);
 
   const handleRoleChange = (value: Role) => {
     setRole(value);
@@ -268,11 +283,31 @@ export function SignupForm({
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="confirmPassword">Confirm</FieldLabel>
+            <FieldLabel htmlFor="confirmPassword">
+              Confirm
+              {formData.confirmPassword.length > 0 && (
+                <span
+                  className={`ml-2 text-xs font-normal ${
+                    formData.password === formData.confirmPassword
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
+                  {formData.password === formData.confirmPassword
+                    ? "✓ Matches"
+                    : "✗ Doesn't match"}
+                </span>
+              )}
+            </FieldLabel>
             <Input
               id="confirmPassword"
               type="password"
               required
+              className={cn(
+                formData.confirmPassword.length > 0 &&
+                  formData.password !== formData.confirmPassword &&
+                  "border-red-500 focus-visible:ring-red-500"
+              )}
               value={formData.confirmPassword}
               onChange={handleInputChange}
             />
@@ -366,24 +401,44 @@ export function SignupForm({
 
             <div className="grid grid-cols-2 gap-4">
               <Field>
-                <FieldLabel htmlFor="universitySupervisorId">Uni Supervisor ID</FieldLabel>
-                <Input
-                  id="universitySupervisorId"
-                  type="text"
-                  required
+                <FieldLabel>University Supervisor</FieldLabel>
+                <Select
                   value={formData.universitySupervisorId}
-                  onChange={handleInputChange}
-                />
+                  onValueChange={(val) =>
+                    setFormData({ ...formData, universitySupervisorId: val })
+                  }
+                >
+                  <SelectTrigger className="w-full h-10 border-input bg-background">
+                    <SelectValue placeholder="Select UI supervisor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniSupervisors.map((sup) => (
+                      <SelectItem key={sup._id} value={sup._id}>
+                        {sup.fullName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </Field>
               <Field>
-                <FieldLabel htmlFor="companySupervisorId">Comp Supervisor ID</FieldLabel>
-                <Input
-                  id="companySupervisorId"
-                  type="text"
-                  required
+                <FieldLabel>Company Supervisor</FieldLabel>
+                <Select
                   value={formData.companySupervisorId}
-                  onChange={handleInputChange}
-                />
+                  onValueChange={(val) =>
+                    setFormData({ ...formData, companySupervisorId: val })
+                  }
+                >
+                  <SelectTrigger className="w-full h-10 border-input bg-background">
+                    <SelectValue placeholder="Select Co supervisor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {compSupervisors.map((sup) => (
+                      <SelectItem key={sup._id} value={sup._id}>
+                        {sup.fullName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </Field>
             </div>
 

@@ -137,3 +137,21 @@ export async function verifyEmail(token: string) {
 
   return response.json();
 }
+
+export async function getUniversitySupervisors() {
+  const response = await fetch(`${API_BASE}/supervisors/university`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!response.ok) throw new Error("Failed to fetch university supervisors");
+  return response.json();
+}
+
+export async function getCompanySupervisors() {
+  const response = await fetch(`${API_BASE}/supervisors/company`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!response.ok) throw new Error("Failed to fetch company supervisors");
+  return response.json();
+}

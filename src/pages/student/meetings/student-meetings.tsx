@@ -25,7 +25,7 @@ interface MeetingForm {
 const DEFAULT_FORM: MeetingForm = {
   scheduledDate: "",
   agenda: "",
-  actualMinutes: "",
+  actualMinutes: "00:00",
   referenceType: "task",
   referenceId: "",
 };
@@ -37,7 +37,6 @@ export default function StudentMeetings() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<MeetingForm>(DEFAULT_FORM);
   const [scheduledDate, setScheduledDate] = useState<Date | null>(null);
-  const [actualMinutes, setActualMinutes] = useState<string | null>(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -50,7 +49,6 @@ export default function StudentMeetings() {
   const resetForm = () => {
     setForm(DEFAULT_FORM);
     setScheduledDate(null);
-    setActualMinutes(null);
     setIsEditing(false);
     setEditingId(null);
   };
@@ -63,7 +61,6 @@ export default function StudentMeetings() {
     const payload = {
       ...form,
       scheduledDate: scheduledDate?.toISOString() ?? "",
-      actualMinutes: actualMinutes ?? "",
     };
     try {
       if (isEditing && editingId) {
@@ -94,7 +91,6 @@ export default function StudentMeetings() {
     setScheduledDate(
       meeting.scheduledDate ? new Date(meeting.scheduledDate) : null,
     );
-    setActualMinutes(meeting.actualMinutes ?? null);
     setEditingId(meeting.id);
     setIsEditing(true);
     setOpen(true);
@@ -136,8 +132,6 @@ export default function StudentMeetings() {
         setForm={setForm}
         scheduledDate={scheduledDate}
         setScheduledDate={setScheduledDate}
-        actualMinutes={actualMinutes}
-        setActualMinutes={setActualMinutes}
         handleSubmit={handleSubmit}
         handleChange={handleChange}
         resetForm={resetForm}
