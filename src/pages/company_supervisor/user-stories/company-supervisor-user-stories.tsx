@@ -25,8 +25,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useToast } from "@/context/toast-context";
-import { getAllProjects } from "@/services/dahsboardSupervisors";
-import { getProjectSprints } from "@/services/supervisor";
+import { getAllProjects, getProgress } from "@/services/dahsboardSupervisors";
 
 // ─── nav ──────────────────────────────────────────────────────────────────────
 
@@ -39,7 +38,7 @@ const navData = {
   ],
 };
 
-// ─── types ─────────────────────────────────────────────────────────────────────
+// ─── types ────────────────────────────────────────────────────────────────────
 
 interface UserStory {
   id?: string;
@@ -50,6 +49,9 @@ interface UserStory {
   startDate?: string;
   endDate?: string;
   sprintTitle?: string;
+  totalTasks?: number;
+  doneTasks?: number;
+  progress?: number;
 }
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -64,8 +66,8 @@ function formatDate(date?: string | null) {
 }
 
 const PRIORITY_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
-  critical: {
-    label: "Critical",
+  highest: {
+    label: "Highest",
     badge: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
     dot: "bg-red-500",
   },
@@ -83,6 +85,11 @@ const PRIORITY_CONFIG: Record<string, { label: string; badge: string; dot: strin
     label: "Low",
     badge: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400",
     dot: "bg-sky-400",
+  },
+  lowest: {
+    label: "Lowest",
+    badge: "bg-muted text-muted-foreground",
+    dot: "bg-muted-foreground",
   },
 };
 
@@ -112,9 +119,7 @@ function UserStoryCard({ story }: { story: UserStory }) {
           <h4 className="font-semibold text-sm leading-snug">{story.title}</h4>
         </div>
         {story.priority && (
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0 ${cfg.badge}`}
-          >
+          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0 ${cfg.badge}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
             {cfg.label}
           </span>
@@ -126,6 +131,22 @@ function UserStoryCard({ story }: { story: UserStory }) {
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
           {story.description}
         </p>
+      )}
+
+      {/* progress */}
+      {story.progress !== undefined && (
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Progress</span>
+            <span>{story.doneTasks ?? 0} / {story.totalTasks ?? 0} tasks</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${Math.min(story.progress, 100)}%` }}
+            />
+          </div>
+        </div>
       )}
 
       {/* footer */}
@@ -165,43 +186,26 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
         setLoading(true);
         setError(null);
 
-        const token =
-          typeof window !== "undefined"
-            ? (localStorage.getItem("token") ?? "")
-            : "";
+        // getProgress retourne { projectProgress, sprints, meetings }
+        // chaque sprint contient userStories: UserStoryProgress[]
+        const result = await getProgress(projectId);
+        const sprints = result.data?.sprints ?? [];
 
-        // 1. fetch sprints
-        const sprintsData: any[] = await getProjectSprints(projectId);
-
-        // 2. fetch user stories for every sprint in parallel
         const allStories: UserStory[] = [];
-
-        await Promise.all(
-          (sprintsData ?? []).map(async (sprint: any) => {
-            const sid = sprint._id ?? sprint.id;
-            if (!sid) return;
-            try {
-              const res = await fetch(`/api/user-story/sprint/${sid}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              });
-              if (!res.ok) return;
-              const json = await res.json();
-              const list: UserStory[] =
-                json?.data?.userStories ?? json?.data ?? [];
-              list.forEach((s) =>
-                allStories.push({ ...s, sprintTitle: sprint.title })
-              );
-            } catch {
-              // skip sprint silently
-            }
-          })
-        );
+        sprints.forEach((sprint: any) => {
+          const sprintTitle = sprint.title;
+          (sprint.userStories ?? []).forEach((story: any) => {
+            allStories.push({
+              ...story,
+              id: story._id ?? story.id,
+              sprintTitle,
+            });
+          });
+        });
 
         setStories(allStories);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load user stories"
-        );
+        setError(err instanceof Error ? err.message : "Failed to load user stories");
       } finally {
         setLoading(false);
       }
@@ -221,7 +225,7 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
     return matchSearch && matchPriority;
   });
 
-  // priority counts for summary badges
+  // priority counts
   const counts = stories.reduce<Record<string, number>>((acc, s) => {
     const p = (s.priority ?? "none").toLowerCase();
     acc[p] = (acc[p] ?? 0) + 1;
@@ -245,9 +249,7 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
                 Students:{" "}
                 {project.contributors
                   .map((c: any) =>
-                    typeof c === "object"
-                      ? (c.fullName ?? c.email ?? "—")
-                      : String(c)
+                    typeof c === "object" ? (c.fullName ?? c.email ?? "—") : String(c)
                   )
                   .join(", ")}
               </p>
@@ -265,10 +267,7 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
                   .map(([p, n]) => {
                     const cfg = getPriorityCfg(p);
                     return (
-                      <span
-                        key={p}
-                        className={`text-xs rounded-full px-2.5 py-0.5 font-medium ${cfg.badge}`}
-                      >
+                      <span key={p} className={`text-xs rounded-full px-2.5 py-0.5 font-medium ${cfg.badge}`}>
                         {n} {cfg.label}
                       </span>
                     );
@@ -278,13 +277,11 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
             <button
               onClick={() => setExpanded((v) => !v)}
               className="ml-1 rounded-md p-1.5 hover:bg-muted transition-colors"
-              aria-label={expanded ? "Collapse" : "Expand"}
             >
-              {expanded ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              )}
+              {expanded
+                ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                : <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              }
             </button>
           </div>
         </div>
@@ -293,7 +290,6 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
       {/* body */}
       {expanded && (
         <div className="p-5 space-y-4">
-          {/* loading */}
           {loading && (
             <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground justify-center">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -301,14 +297,12 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
             </div>
           )}
 
-          {/* error */}
           {!loading && error && (
             <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}
             </div>
           )}
 
-          {/* empty */}
           {!loading && !error && stories.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 gap-2">
               <BookOpen className="h-8 w-8 text-muted-foreground/40" />
@@ -339,23 +333,22 @@ function ProjectUserStoriesSection({ project }: { project: any }) {
                   className="rounded-lg border bg-background pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer"
                 >
                   <option value="all">All priorities</option>
-                  <option value="critical">Critical</option>
+                  <option value="highest">Highest</option>
                   <option value="high">High</option>
                   <option value="medium">Medium</option>
                   <option value="low">Low</option>
+                  <option value="lowest">Lowest</option>
                 </select>
               </div>
             </div>
           )}
 
-          {/* no results after filter */}
           {!loading && !error && stories.length > 0 && filtered.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
               No stories match your search.
             </p>
           )}
 
-          {/* grid */}
           {!loading && !error && filtered.length > 0 && (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((story, idx) => (
@@ -470,9 +463,7 @@ export default function CompanySupervisorUserStories() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/company/dashboard">
-                    Dashboard
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href="/company/dashboard">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
